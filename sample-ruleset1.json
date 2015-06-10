@@ -1,0 +1,9 @@
+{
+  "rules": [
+    {
+      "caption": "rule 1",
+      "position": 0,
+      "rule": {}
+    },
+  ]
+}
