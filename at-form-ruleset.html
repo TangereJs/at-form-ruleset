@@ -1,14 +1,346 @@
 <link rel="import" href="../layout/layout.html">
+<link rel="import" href="../at-form-rule-edit/at-form-rule-edit.html">
+<link rel="import" href="../at-core-theme/at-core-theme.html">
+<link rel="import" href="../at-carbon-icon/at-carbon-icon.html">
+<!-- 
+What this component does:
+  - this component provides the UI for manipulating sets of rules - rulesets
+  - rules can be added, removed, edited, reordered
+  - for each rule conditions and actions can be added, removed, edited, reordered  
+
+Use cases:
+  1) validate HTML form(s)?
+  2) validate at-form(s)?
+  3) something else ... 
+
+Design guidelines:
+  1) use MVC
+    - use ruleset & value as MODEL
+    - condition describes a logical condition (ie some value is <= some other value)
+    - action describes an action that can be executed (ie assign value to a field, show alert, etc ... )
+    - rule consists of conditions and actions    
+    - ruleset describes what operations can be performed on what field types for the current situation
+    - value describes what rules are initially assigned for the current situation    
+
+    - use <template> for VIEW
+    - this should work; I assume polymer team fixed them so they work; it shouldn't take much time to figure out how to use
+    - alternative to <templates> is function templates - create html programmatically
+    - alternative is future proof because polymer team may decide to break <templates>
+    
+    - use events and event handlers as CONTROLLER
+
+  2) recycle philosophy from at-form-rule-edit
+    - copy / adapt conditions
+    - copy / adapt actions
+    - copy / adapt "ruleEngine" - checks conditions against current data and executes the actions as necessary
+-->
 
 <dom-module id="at-form-ruleset">
+  <style>
+    .ruleBorder {
+      border-color: crimson;
+      border-width: medium;
+      border-style: dotted;
+    }
+  </style>
   <template>
-    <p>This is SPARTA!!!</p>
+    <at-core-theme></at-core-theme>
+    <p>Ruleset:</p>
+    <div class="vertical layout">
+      <div class="horizontal layout">
+        <a id="addRuleButton" href="javascript:void(0)">Add rule ...</a>
+      </div>
+      <div id="ruleInsertPoint" class="vertical layout">
+
+      </div>
+    </div>
   </template>
 </dom-module>
 <script>
+  'use strict';
+  //  It appears that .ruleset property and .value property mean the same thing. IMO, .ruleset should be removed because .value is standard way of naming in at-form-* components
   Polymer({
     is: 'at-form-ruleset',
-    properties: {},
-    ready: function () {}
+    _scopeCssViaAttr: true,
+    properties: {
+      ruleset: {
+        type: Array,
+        value: function () {
+          return [];
+        },
+        observer: 'rulesetChanged'
+      },
+      value: {
+        type: Array,
+        value: function () {
+          return [];
+        },
+        observer: 'valueChanged',
+        notify: true
+      },
+      disabled: {
+        type: Boolean,
+        value: false,
+        observer: 'disabledChanged'
+      },
+      required: {
+        type: Boolean,
+        value: false,
+        observer: 'requiredChanged'
+      },
+      valid: {
+        type: Boolean,
+        value: true,
+        observer: 'validChanged'
+      }
+    },
+    ready: function () {
+      var self = this;
+      this.$.addRuleButton.addEventListener('mousedown', function (event) {
+        self._addRule();
+      });
+    },
+    rulesetChanged: function (newValue, oldValue) {
+//      this.__rebuildHtml();
+    },
+    valueChanged: function (newValue, oldValue) {
+      this.__rebuildHtml();
+    },
+    disabledChanged: function (newValue, oldValue) {},
+    requiredChanged: function (newValue, oldValue) {},
+    validChanged: function (newValue, oldValue) {},
+    _addRule: function () {
+      var ruleIndex = this.value.length;
+      var newRule = {
+        caption: 'Rule #' + ruleIndex,
+        position: ruleIndex,
+        rule: {}
+      };
+
+      this.value.push(newRule);
+      this.__rebuildHtml();
+    },
+    _removeRule: function (ruleIndex) {
+      this.value.splice(ruleIndex, 1);
+      this.__rebuildHtml();
+    },
+    _reorderMoveUp: function (ruleIndex) {
+      var moveToIndex = ruleIndex - 1;
+      var tmp;
+
+      tmp = this.value[ruleIndex];
+      this.value[ruleIndex] = this.value[moveToIndex];
+      this.value[moveToIndex] = tmp;
+
+      this.__rebuildHtml();
+    },
+    _reorderMoveDown: function (ruleIndex) {
+      var moveToIndex = ruleIndex + 1;
+      var tmp;
+
+      tmp = this.value[ruleIndex];
+      this.value[ruleIndex] = this.value[moveToIndex];
+      this.value[moveToIndex] = tmp;
+
+      this.__rebuildHtml();
+    },
+
+    __rebuildHtml: function () {
+      var
+        ruleIndex,
+        rule,
+        ruleHtml,
+        isFirst, isLast;
+
+      Polymer.dom(this.$.ruleInsertPoint).innerHTML = '';
+
+      for (ruleIndex = 0; ruleIndex < this.value.length; ruleIndex += 1) {
+        rule = this.value[ruleIndex];
+        isFirst = ruleIndex === 0;
+        isLast = ruleIndex === this.value.length - 1;
+        ruleHtml = this.__buildRuleHtml(rule, isFirst, isLast, ruleIndex);
+
+        Polymer.dom(this.$.ruleInsertPoint).appendChild(ruleHtml);
+      }
+    },
+    __buildRuleHtml: function (rule, isFirst, isLast, ruleIndexInValueArray) {
+      var ruleHtml,
+        captionActionsDiv,
+        captionSpan,
+        moveUpBtn,
+        moveDownBtn,
+        removeBtn,
+        ruleDiv,
+        atFormRuleElem,
+        tmpSpan,
+        tmpDiv,
+        ruleCaptionText,
+        self = this,
+        icon,
+        text;
+
+      ruleCaptionText = rule && rule.caption ? rule.caption : '';
+
+      // rule html is a div with vertical layout
+      // it contains two divs with horizontal layouts
+      // first div contains caption and move up / down links and remove link
+      // second div contains the at-form-rule-edit component
+
+      // create the html
+
+      ruleHtml = document.createElement('div');
+      ruleHtml.classList.add('vertical');
+      ruleHtml.classList.add('layout');
+      ruleHtml.classList.add('ruleBorder'); // border is for debug purposes
+
+      captionActionsDiv = document.createElement('div');
+      captionActionsDiv.classList.add('horizontal');
+      captionActionsDiv.classList.add('layout');
+
+      tmpDiv = document.createElement('div');
+      tmpSpan = document.createElement('span');
+      tmpSpan.textContent = 'Caption : ';
+      captionSpan = document.createElement('span');
+      captionSpan.textContent = ruleCaptionText;
+      tmpDiv.appendChild(tmpSpan);
+      tmpDiv.appendChild(captionSpan);
+
+      captionActionsDiv.appendChild(tmpDiv);
+
+      if (!isFirst) {
+        tmpDiv = document.createElement('div');
+        moveUpBtn = document.createElement('div');
+
+        icon = document.createElement('at-carbon-icon');
+        icon.icon = 'arrow-up';
+        moveUpBtn.appendChild(icon)
+
+        moveUpBtn.id = 'moveUpButton';
+        text = document.createTextNode('Move up');
+        moveUpBtn.appendChild(text);
+        moveUpBtn.classList.add('ui');
+        moveUpBtn.classList.add('right');
+        moveUpBtn.classList.add('labeled');
+        moveUpBtn.classList.add('icon');
+        moveUpBtn.classList.add('button');
+        moveUpBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
+        tmpDiv.appendChild(moveUpBtn);
+      }
+      captionActionsDiv.appendChild(tmpDiv);
+
+      if (!isLast) {
+        tmpDiv = document.createElement('div');
+        moveDownBtn = document.createElement('div');
+
+        icon = document.createElement('at-carbon-icon');
+        icon.icon = 'arrow-down';
+        moveDownBtn.appendChild(icon)
+
+        moveDownBtn.id = 'moveDownButton';
+        text = document.createTextNode('Move down');
+        moveDownBtn.appendChild(text);
+        moveDownBtn.classList.add('ui');
+        moveDownBtn.classList.add('right');
+        moveDownBtn.classList.add('labeled');
+        moveDownBtn.classList.add('icon');
+        moveDownBtn.classList.add('button');
+        moveDownBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
+        tmpDiv.appendChild(moveDownBtn);
+
+        captionActionsDiv.appendChild(tmpDiv);
+      }
+
+      tmpDiv = document.createElement('div');
+      removeBtn = document.createElement('div');
+
+      icon = document.createElement('at-carbon-icon');
+      icon.icon = 'cancel';
+      removeBtn.appendChild(icon);
+
+      removeBtn.id = 'removeBtn';
+      text = document.createTextNode('Remove');
+      removeBtn.appendChild(text);
+      removeBtn.classList.add('ui');
+      removeBtn.classList.add('right');
+      removeBtn.classList.add('labeled');
+      removeBtn.classList.add('icon');
+      removeBtn.classList.add('button');
+      removeBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
+      tmpDiv.appendChild(removeBtn);
+
+      captionActionsDiv.appendChild(tmpDiv);
+
+      ruleHtml.appendChild(captionActionsDiv);
+
+      ruleDiv = document.createElement('div');
+      ruleDiv.classList.add('horizontal');
+      ruleDiv.classList.add('layout');
+
+      tmpDiv = document.createElement('div');
+      atFormRuleElem = document.createElement('at-form-rule-edit');
+      if (rule.rule && rule.rule.config) {
+        atFormRuleElem.ruleConfig = rule.rule.config;
+      }
+      if (rule.rule && rule.rule.value) {
+        atFormRuleElem.value = rule.rule.value;
+      }
+
+      tmpDiv.appendChild(atFormRuleElem);
+
+      ruleDiv.appendChild(tmpDiv);
+      ruleHtml.appendChild(ruleDiv);
+
+      // setup event listeners
+
+      if (moveUpBtn) {
+        moveUpBtn.addEventListener('click', function (event) {
+          var ruleIndex = event.target.getAttribute('data-ruleIndex');
+          ruleIndex = parseInt(ruleIndex);
+          self._reorderMoveUp(ruleIndex);
+          return false;
+        });
+      }
+
+      if (moveDownBtn) {
+        moveDownBtn.addEventListener('click', function (event) {
+          var ruleIndex = event.target.getAttribute('data-ruleIndex');
+          ruleIndex = parseInt(ruleIndex);
+          self._reorderMoveDown(ruleIndex);
+          return false;
+        });
+      }
+
+      removeBtn.addEventListener('click', function (event) {
+        var ruleIndex = event.target.getAttribute('data-ruleIndex');
+        ruleIndex = parseInt(ruleIndex);
+        self._removeRule(ruleIndex);
+        return false;
+      });
+
+      return ruleHtml;
+    }
   });
 </script>
+
+
+<!-- HTML template for the rule
+  <div class="vertical layout">
+    <div class="horizontal layout">
+      <div>
+        Caption: <span id="ruleCaption"></span>
+      </div>
+      <div>
+        <a id="moveUpButton" href="javascript:void(0)">Move up</a>
+      </div>
+      <div>
+        <a id="moveDownButton" href="javascript:void(0)">Move down</a>
+      </div>
+      <div>
+        <a id="removeRuleButton" href="javascript:void(0)">Remove</a>
+      </div>
+    </div>
+    <div class="horizontal layout">
+      <at-form-rule-edit></at-form-rule-edit>
+    </div>
+  </div>
+-->
