@@ -29,6 +29,24 @@
 
 <script>
   document.addEventListener('WebComponentsReady', function () {
+    var treeOptions = [
+      {
+        label: "",
+        name: ""
+      },
+      {
+        label: "Oak",
+        name: "oak"
+      },
+      {
+        label: "Chestnut",
+        name: "chestnut"
+      },
+      {
+        label: "Pine",
+        name: "pine"
+      }
+    ];
     var enemyOptions = [
       {
         label: "",
@@ -51,8 +69,8 @@
     var ruleConfig = {
       conditions: [
         {
-          label: "Damage",
-          name: "damageField",
+          label: "Flower",
+          name: "flowerField",
           operators: [
             {
               label: "is equal to",
@@ -67,8 +85,8 @@
             ]
           },
         {
-          label: "Health",
-          name: "healthField",
+          label: "Number of birds",
+          name: "numberOfBirdsField",
           operators: [
             {
               label: "is greater than or equal to",
@@ -83,9 +101,9 @@
             ]
           },
         {
-          label: "Enemy",
-          name: "enemyField",
-          options: enemyOptions,
+          label: "Tree",
+          name: "treeField",
+          options: treeOptions,
           operators: [
             {
               label: "is present",
@@ -132,8 +150,8 @@
               fieldType: "select",
               options: [
                 {
-                  label: "Damage to",
-                  name: "damageField",
+                  label: "Flower to",
+                  name: "flowerField",
                   fields: [
                     {
                       label: "New Value",
@@ -143,8 +161,8 @@
                   ]
                 },
                 {
-                  label: "Health to",
-                  name: "healthField",
+                  label: "Number of birds to",
+                  name: "numberOfBirdsField",
                   fields: [
                     {
                       label: "New Value",
@@ -154,14 +172,14 @@
                   ]
                 },
                 {
-                  label: "Enemy to",
-                  name: "enemyField",
+                  label: "Tree to",
+                  name: "treeField",
                   fields: [
                     {
                       label: "New Value",
                       name: "newValue",
                       fieldType: "select",
-                      options: enemyOptions
+                      options: treeOptions
                       }
                   ]
                 }
@@ -176,14 +194,14 @@
       conditions: {
         "all": [
           {
-            name: "damageField",
+            name: "flowerField",
             operator: "equalTo",
-            value: "50"
+            value: "rose"
             },
           {
-            name: "healthField",
+            name: "numberOfBirdsField",
             operator: "lessThanEqual",
-            value: "49"
+            value: "30"
             }
           ]
       },
@@ -194,7 +212,7 @@
           fields: [
             {
               name: "message",
-              value: "You have been ... !"
+              value: "The flowers smells nice :)"
               }
             ]
           },
@@ -204,11 +222,11 @@
           fields: [
             {
               name: "fieldId",
-              value: "enemyField",
+              value: "treeField",
               fields: [
                 {
                   name: "newValue",
-                  value: "enemy3"
+                  value: "pine"
                   }
                ]
              }
@@ -407,7 +425,7 @@
     var demoRuleset = document.getElementById('demoRuleset');
     demoRuleset.value = ruleset;
     
-    window.djuraMika = demoRuleset.value;
+    window.test = demoRuleset.value;
   });
 </script>
 
