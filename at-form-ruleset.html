@@ -48,10 +48,11 @@ Design guidelines:
     <p>Ruleset:</p>
     <div class="vertical layout">
       <div class="horizontal layout">
-        <a id="addRuleButton" href="javascript:void(0)">Add rule ...</a>
+        <div id="addRuleButton" class="ui button">
+          <at-carbon-icon icon="now:plus"></at-carbon-icon> Add rule ...
+        </div>
       </div>
       <div id="ruleInsertPoint" class="vertical layout">
-
       </div>
     </div>
   </template>
@@ -59,16 +60,18 @@ Design guidelines:
 <script>
   'use strict';
   //  It appears that .ruleset property and .value property mean the same thing. IMO, .ruleset should be removed because .value is standard way of naming in at-form-* components
+  // *ij* ruleset needs config; .ruleset property should be renamed to ruleConfig; this would be either json schema or static config for the at-form-rule-edit
+  // use case is that one ruleset should be built for a single schema; multiple rules share a single schema but each rule has its own data
   Polymer({
     is: 'at-form-ruleset',
     _scopeCssViaAttr: true,
     properties: {
-      ruleset: {
-        type: Array,
+      ruleConfig: {
+        type: Object,
         value: function () {
-          return [];
+          return {};
         },
-        observer: 'rulesetChanged'
+        observer: 'ruleConfigChanged'
       },
       value: {
         type: Array,
@@ -82,16 +85,6 @@ Design guidelines:
         type: Boolean,
         value: false,
         observer: 'disabledChanged'
-      },
-      required: {
-        type: Boolean,
-        value: false,
-        observer: 'requiredChanged'
-      },
-      valid: {
-        type: Boolean,
-        value: true,
-        observer: 'validChanged'
       }
     },
     ready: function () {
@@ -100,15 +93,60 @@ Design guidelines:
         self._addRule();
       });
     },
-    rulesetChanged: function (newValue, oldValue) {
-//      this.__rebuildHtml();
+    __ruleConfigEmpty: function () {
+      return Object.keys(this.ruleConfig).length === 0;
+    },
+    __valueEmpty: function () {
+      return this.value.length === 0;
+    },
+    ruleConfigChanged: function (newValue, oldValue) {
+      this.__rebuildHtml();
     },
     valueChanged: function (newValue, oldValue) {
       this.__rebuildHtml();
     },
-    disabledChanged: function (newValue, oldValue) {},
-    requiredChanged: function (newValue, oldValue) {},
-    validChanged: function (newValue, oldValue) {},
+    disabledChanged: function (newValue, oldValue) {
+//      debugger;
+      // update add rule button state
+      // update move up / down / remove buttons
+      var
+        uiButtonIndex,
+        uiButton,
+        uiButtons,
+        captionInputIndex,
+        captionInput,
+        captionInputs,
+        ruleEditIndex,
+        ruleEdit,
+        ruleEdits;
+
+      uiButtons = this.querySelectorAll('.ui.button');
+      for (uiButtonIndex = 0; uiButtonIndex < uiButtons.length; uiButtonIndex += 1) {
+        if (newValue) {
+          uiButtons[uiButtonIndex].classList.add('disabled');
+        } else {
+          uiButtons[uiButtonIndex].classList.remove('disabled');
+        }
+      }
+
+      // update caption input field
+      captionInputs = this.querySelectorAll('input');
+      for (captionInputIndex = 0; captionInputIndex < captionInputs.length; captionInputIndex += 1) {
+        if (newValue) {
+          captionInputs[captionInputIndex].setAttribute('disabled', 'disabled');
+        } else {
+          captionInputs[captionInputIndex].removeAttribute('disabled');
+        }
+      }
+
+      // disable the at-form-rule-edit elements
+      ruleEdits = this.querySelectorAll('at-form-rule-edit');
+      for (ruleEditIndex = 0; ruleEditIndex < ruleEdits.length; ruleEditIndex += 1) {
+        ruleEdit = ruleEdits[ruleEditIndex];
+        ruleEdit.disabled = newValue;
+      }
+
+    },
     _addRule: function () {
       var ruleIndex = this.value.length;
       var newRule = {
@@ -152,6 +190,11 @@ Design guidelines:
         ruleHtml,
         isFirst, isLast;
 
+      if (this.__ruleConfigEmpty()) {
+        console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
+        return;
+      }
+
       Polymer.dom(this.$.ruleInsertPoint).innerHTML = '';
 
       for (ruleIndex = 0; ruleIndex < this.value.length; ruleIndex += 1) {
@@ -166,7 +209,7 @@ Design guidelines:
     __buildRuleHtml: function (rule, isFirst, isLast, ruleIndexInValueArray) {
       var ruleHtml,
         captionActionsDiv,
-        captionSpan,
+        captionInput,
         moveUpBtn,
         moveDownBtn,
         removeBtn,
@@ -200,10 +243,20 @@ Design guidelines:
       tmpDiv = document.createElement('div');
       tmpSpan = document.createElement('span');
       tmpSpan.textContent = 'Caption : ';
-      captionSpan = document.createElement('span');
-      captionSpan.textContent = ruleCaptionText;
+      captionInput = document.createElement('input');
+      captionInput.setAttribute('type', 'text');
+      captionInput.value = ruleCaptionText;
+      captionInput.classList.add('value');
+      captionInput.setAttribute('data-rule-index', ruleIndexInValueArray);
+      if (this.disabled) {
+        captionInput.setAttribute('disabled', 'disabled');
+      }
+      captionInput.addEventListener('change', function (event) {
+        var ruleIndex = parseInt(captionInput.getAttribute('data-rule-index'));
+        self.value[ruleIndex].caption = captionInput.value;
+      });
       tmpDiv.appendChild(tmpSpan);
-      tmpDiv.appendChild(captionSpan);
+      tmpDiv.appendChild(captionInput);
 
       captionActionsDiv.appendChild(tmpDiv);
 
@@ -223,6 +276,9 @@ Design guidelines:
         moveUpBtn.classList.add('labeled');
         moveUpBtn.classList.add('icon');
         moveUpBtn.classList.add('button');
+        if (this.disabled) {
+          moveUpBtn.classList.add('disabled');
+        }
         moveUpBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
         tmpDiv.appendChild(moveUpBtn);
       }
@@ -244,6 +300,9 @@ Design guidelines:
         moveDownBtn.classList.add('labeled');
         moveDownBtn.classList.add('icon');
         moveDownBtn.classList.add('button');
+        if (this.disabled) {
+          moveDownBtn.classList.add('disabled');
+        }
         moveDownBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
         tmpDiv.appendChild(moveDownBtn);
 
@@ -265,6 +324,9 @@ Design guidelines:
       removeBtn.classList.add('labeled');
       removeBtn.classList.add('icon');
       removeBtn.classList.add('button');
+      if (this.disabled) {
+        removeBtn.classList.add('disabled');
+      }
       removeBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
       tmpDiv.appendChild(removeBtn);
 
@@ -278,11 +340,16 @@ Design guidelines:
 
       tmpDiv = document.createElement('div');
       atFormRuleElem = document.createElement('at-form-rule-edit');
-      if (rule.rule && rule.rule.config) {
-        atFormRuleElem.ruleConfig = rule.rule.config;
+      atFormRuleElem.disabled = this.disabled;
+      if (this.ruleConfig.properties) {
+        atFormRuleElem.schema = this.ruleConfig;
+      } else if (this.ruleConfig.conditions && this.ruleConfig.actions) {
+        atFormRuleElem.ruleConfig = this.ruleConfig;
       }
-      if (rule.rule && rule.rule.value) {
-        atFormRuleElem.value = rule.rule.value;
+
+
+      if (rule.rule) {
+        atFormRuleElem.value = rule.rule;
       }
 
       tmpDiv.appendChild(atFormRuleElem);
