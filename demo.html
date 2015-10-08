@@ -50,7 +50,7 @@
 </body>
 
 <script>
-  document.addEventListener('WebComponentsReady', function () {
+  document.addEventListener('WebComponentsReady', function() {
 
     var ruleSchema = {
       properties: {
@@ -72,60 +72,38 @@
 
     var ruleData = {
       conditions: {
-        "all": [
-          {
-            name: "flower",
-            operator: "equalTo",
-            value: "rose"
-            },
-          {
-            name: "numberOfBirds",
-            operator: "lessThanEqual",
-            value: "30"
-            }
-          ]
+        kind: "all",
+        conditions: [{
+          name: "flower",
+          operator: "equalTo",
+          compareTo: "text",
+          value: "rose"
+        }, {
+          name: "numberOfBirds",
+          operator: "lessThanEqual",
+          compareTo: "text",
+          value: "30"
+        }]
       },
-      actions: [
-        {
-          name: "action-select",
-          value: "alert",
-          fields: [
-            {
-              name: "message",
-              value: "The flowers smells nice :)"
-              }
-            ]
-          },
-        {
-          name: "action-select",
-          value: "updateField",
-          fields: [
-            {
-              name: "fieldId",
-              value: "treeField",
-              fields: [
-                {
-                  name: "newValue",
-                  value: "Pine"
-                  }
-               ]
-             }
-            ]
-          }
-      ]
+      actions: [{
+        actionName: "alert",
+        message: "The flowers smells nice :)"
+      }, {
+        actionName: "updateField",
+        fieldName: "tree",
+        updateTo: "Pine"
+      }]
     };
 
-    var ruleset = [
-      {
-        caption: "Mwahahaha!",
-        position: 0,
-        rule: ruleData
-      }, {
-        caption: "Bwahahaha!",
-        position: 1,
-        rule: ruleData
-      }
-    ];
+    var ruleset = [{
+      caption: "Mwahahaha!",
+      position: 0,
+      rule: ruleData
+    }, {
+      caption: "Bwahahaha!",
+      position: 1,
+      rule: ruleData
+    }];
 
     var coreForm = document.getElementById('coreForm');
     coreForm.schema = ruleSchema;
@@ -134,7 +112,7 @@
     demoRuleset.value = ruleset;
 
     var verifyRulesetBtn = document.getElementById('verifyRuleset');
-    verifyRulesetBtn.addEventListener('click', function (e) {
+    verifyRulesetBtn.addEventListener('click', function(e) {
       e.preventDefault();
 
       var
@@ -151,15 +129,12 @@
 
         conditionsAdapter = coreForm.data;
         actionsAdapter = {
-          alert: function (data) {
-            alert(data.find("message"));
+          alert: function(data) {
+            alert(data.message);
           },
-          updateField: function (data) {
-            console.log("data", data);
-            var fieldId = data.find("fieldId");
-            console.log("fieldId", fieldId);
-            fieldId = fieldId.replace('Field', '');
-            var val = data.find("fieldId", "newValue");
+          updateField: function(data) {
+            var fieldId = data.fieldName
+            var val = data.updateTo;
             if (val === "true") {
               val = true;
             }
@@ -168,19 +143,16 @@
             }
             coreForm.updateFormElementData(fieldId, val);
           },
-          setFieldState: function (data) {
-            var fieldId = data.find("fieldId");
-            var val = data.find("fieldId", "newState");
-            fieldId = fieldId.replace('Field', '');
+          setFieldState: function(data) {
+            var fieldId = data.fieldName
+            var val = data.state;
             coreForm.setElementState(fieldId, val, val);
           },
-          copyFieldValue: function (data) {
-            var srcFieldId = data.find('fieldId');
-            srcFieldId = srcFieldId.replace('Field', '');
-            var destFieldId = data.find('newValue');
+          copyFieldValue: function(data) {
+            var srcFieldId = data.fieldName;
+            var destFieldId = data.copyTo;
 
             var srcValue = coreForm.data[srcFieldId];
-            destFieldId = destFieldId.replace('Field', '');
             coreForm.updateFormElementData(destFieldId, srcValue);
           }
         };
@@ -189,9 +161,9 @@
     });
 
     var disableRulesetBtn = document.getElementById('disableRuleset');
-    disableRulesetBtn.addEventListener('click', function(){
+    disableRulesetBtn.addEventListener('click', function() {
       demoRuleset.disabled = !demoRuleset.disabled;
-    });    
+    });
 
     window.test = demoRuleset.value;
   });
