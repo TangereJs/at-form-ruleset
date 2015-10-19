@@ -1,5 +1,5 @@
 <link rel="import" href="../layout/layout.html">
-<link rel="import" href="../at-form-rule-edit/at-form-rule-edit.html">
+<link rel="import" href="../at-rule-edit/at-rule-edit.html">
 <link rel="import" href="../at-core-theme/at-core-theme.html">
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html">
 <!--
@@ -29,7 +29,7 @@ Design guidelines:
 
     - use events and event handlers as CONTROLLER
 
-  2) recycle philosophy from at-form-rule-edit
+  2) recycle philosophy from at-rule-edit
     - copy / adapt conditions
     - copy / adapt actions
     - copy / adapt "ruleEngine" - checks conditions against current data and executes the actions as necessary
@@ -68,7 +68,7 @@ Design guidelines:
 <script>
   'use strict';
   //  It appears that .ruleset property and .value property mean the same thing. IMO, .ruleset should be removed because .value is standard way of naming in at-form-* components
-  // *ij* ruleset needs config; .ruleset property should be renamed to ruleConfig; this would be either json schema or static config for the at-form-rule-edit
+  // *ij* ruleset needs config; .ruleset property should be renamed to ruleConfig; this would be either json schema or static config for the at-rule-edit
   // use case is that one ruleset should be built for a single schema; multiple rules share a single schema but each rule has its own data
   Polymer({
     is: 'at-form-ruleset',
@@ -159,8 +159,8 @@ Design guidelines:
         }
       }
 
-      // disable the at-form-rule-edit elements
-      ruleEdits = this.querySelectorAll('at-form-rule-edit');
+      // disable the at-rule-edit elements
+      ruleEdits = this.querySelectorAll('at-rule-edit');
       for (ruleEditIndex = 0; ruleEditIndex < ruleEdits.length; ruleEditIndex += 1) {
         ruleEdit = ruleEdits[ruleEditIndex];
         ruleEdit.disabled = newValue;
@@ -247,7 +247,7 @@ Design guidelines:
       // rule html is a div with vertical layout
       // it contains two divs with horizontal layouts
       // first div contains caption and move up / down links and remove link
-      // second div contains the at-form-rule-edit component
+      // second div contains the at-rule-edit component
 
       // create the html
 
@@ -359,7 +359,7 @@ Design guidelines:
       ruleDiv.classList.add('layout');
 
       tmpDiv = document.createElement('div');
-      atFormRuleElem = document.createElement('at-form-rule-edit');
+      atFormRuleElem = document.createElement('at-rule-edit');
       atFormRuleElem.disabled = this.disabled;
       if (this.ruleConfig.properties) {
         atFormRuleElem.schema = this.ruleConfig;
@@ -427,7 +427,7 @@ Design guidelines:
       </div>
     </div>
     <div class="horizontal layout">
-      <at-form-rule-edit></at-form-rule-edit>
+      <at-rule-edit></at-rule-edit>
     </div>
   </div>
 -->

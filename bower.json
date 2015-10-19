@@ -2,8 +2,8 @@
   "name": "at-form-date",
   "private": true,
   "dependencies": {
-    "webcomponentsjs": "webcomponents/webcomponentsjs#master",
     "polymer": "Polymer/polymer#0.8-preview",
-    "layout": "Polymer/layout#0.8-preview"
+    "layout": "Polymer/layout#0.8-preview",
+    "at-rule-edit": "TangereJs/at-rule-edit#0.8-preview"
   }
 }
