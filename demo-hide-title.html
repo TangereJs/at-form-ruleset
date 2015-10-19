@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <title></title>
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../polymer/polymer.html">
+  <link rel="import" href="../layout/layout.html">
+  <link rel="import" href="../at-core-form/at-core-form.html">
+  <link rel="import" href="at-form-ruleset.html">
+
+  <style>
+    .light-padding {
+      padding-left: 6px;
+      padding-right: 6px;
+      margin: 2px;
+      border: 1px solid #bbb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="vertical layout">
+    <div class="horizontal layout">
+      <h2>This is a demo for at-form-ruleset</h2>
+    </div>
+    <div class="horizontal layout">
+      <button id="disableRuleset">Toggle Disable</button>
+    </div>
+    <div class="horizontal layout">
+      <div class="flex-6 light-padding">
+        <at-core-form id="coreForm">
+        </at-core-form>
+      </div>
+      <div class="flex-6 light-padding">
+        <at-form-ruleset id="demoRuleset" hide-title="true">
+        </at-form-ruleset>
+      </div>
+    </div>
+    <div class="horizontal layout center-justified light-padding">
+      <button id="verifyRuleset">Verify Ruleset</button>
+    </div>
+  </div>
+</body>
+
+<script>
+  document.addEventListener('WebComponentsReady', function() {
+
+    var ruleSchema = {
+      properties: {
+        flower: {
+          description: 'Flower',
+          type: 'string'
+        },
+        numberOfBirds: {
+          description: 'Number of birds',
+          type: 'number'
+        },
+        tree: {
+          description: 'Tree',
+          type: 'enum',
+          xvaluelist: 'Oak,Chestnut,Pine'
+        }
+      }
+    };
+
+    var ruleData = {
+      conditions: {
+        kind: "all",
+        conditions: [{
+          name: "flower",
+          operator: "equalTo",
+          compareTo: "text",
+          value: "rose"
+        }, {
+          name: "numberOfBirds",
+          operator: "lessThanEqual",
+          compareTo: "text",
+          value: "30"
+        }]
+      },
+      actions: [{
+        actionName: "alert",
+        message: "The flowers smells nice :)"
+      }, {
+        actionName: "updateField",
+        fieldName: "tree",
+        updateTo: "Pine"
+      }]
+    };
+
+    var ruleset = [{
+      caption: "Mwahahaha!",
+      position: 0,
+      rule: ruleData
+    }, {
+      caption: "Bwahahaha!",
+      position: 1,
+      rule: ruleData
+    }];
+
+    var coreForm = document.getElementById('coreForm');
+    coreForm.schema = ruleSchema;
+    var demoRuleset = document.getElementById('demoRuleset');
+    demoRuleset.ruleConfig = ruleSchema;
+    demoRuleset.value = ruleset;
+
+    var verifyRulesetBtn = document.getElementById('verifyRuleset');
+    verifyRulesetBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      var
+        ruleIndex,
+        rule,
+        engine,
+        conditionsAdapter,
+        actionsAdapter;
+
+      for (ruleIndex = 0; ruleIndex < demoRuleset.value.length; ruleIndex += 1) {
+        rule = demoRuleset.value[ruleIndex];
+        engine = new window.RuleEngine(rule.rule);
+
+
+        conditionsAdapter = coreForm.data;
+        actionsAdapter = {
+          alert: function(data) {
+            alert(data.message);
+          },
+          updateField: function(data) {
+            var fieldId = data.fieldName
+            var val = data.updateTo;
+            if (val === "true") {
+              val = true;
+            }
+            if (val === "false") {
+              val = false;
+            }
+            coreForm.updateFormElementData(fieldId, val);
+          },
+          setFieldState: function(data) {
+            var fieldId = data.fieldName
+            var val = data.state;
+            coreForm.setElementState(fieldId, val, val);
+          },
+          copyFieldValue: function(data) {
+            var srcFieldId = data.fieldName;
+            var destFieldId = data.copyTo;
+
+            var srcValue = coreForm.data[srcFieldId];
+            coreForm.updateFormElementData(destFieldId, srcValue);
+          }
+        };
+        engine.run(conditionsAdapter, actionsAdapter);
+      }
+    });
+
+    var disableRulesetBtn = document.getElementById('disableRuleset');
+    disableRulesetBtn.addEventListener('click', function() {
+      demoRuleset.disabled = !demoRuleset.disabled;
+    });
+
+    window.test = demoRuleset.value;
+  });
+</script>
+
+</html>

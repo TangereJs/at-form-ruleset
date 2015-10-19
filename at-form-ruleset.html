@@ -2,31 +2,31 @@
 <link rel="import" href="../at-form-rule-edit/at-form-rule-edit.html">
 <link rel="import" href="../at-core-theme/at-core-theme.html">
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html">
-<!-- 
+<!--
 What this component does:
   - this component provides the UI for manipulating sets of rules - rulesets
   - rules can be added, removed, edited, reordered
-  - for each rule conditions and actions can be added, removed, edited, reordered  
+  - for each rule conditions and actions can be added, removed, edited, reordered
 
 Use cases:
   1) validate HTML form(s)?
   2) validate at-form(s)?
-  3) something else ... 
+  3) something else ...
 
 Design guidelines:
   1) use MVC
     - use ruleset & value as MODEL
     - condition describes a logical condition (ie some value is <= some other value)
     - action describes an action that can be executed (ie assign value to a field, show alert, etc ... )
-    - rule consists of conditions and actions    
+    - rule consists of conditions and actions
     - ruleset describes what operations can be performed on what field types for the current situation
-    - value describes what rules are initially assigned for the current situation    
+    - value describes what rules are initially assigned for the current situation
 
     - use <template> for VIEW
     - this should work; I assume polymer team fixed them so they work; it shouldn't take much time to figure out how to use
     - alternative to <templates> is function templates - create html programmatically
     - alternative is future proof because polymer team may decide to break <templates>
-    
+
     - use events and event handlers as CONTROLLER
 
   2) recycle philosophy from at-form-rule-edit
@@ -43,10 +43,17 @@ Design guidelines:
       border-width: thin;
       border-style: solid;
     }
+    .hide-label {
+      display: none;
+    }
   </style>
   <template>
     <at-core-theme></at-core-theme>
-    <p>Ruleset:</p>
+    <div class="vertical layout">
+      <div id="labelContainer">
+        <label>{{label}}</label>
+      </div>
+    </div>
     <div class="vertical layout">
       <div class="horizontal layout">
         <div id="addRuleButton" class="ui button">
@@ -86,6 +93,15 @@ Design guidelines:
         type: Boolean,
         value: false,
         observer: 'disabledChanged'
+      },
+      label: {
+        type: String,
+        value: 'Ruleset: '
+      },
+      hideTitle: {
+        type: Boolean,
+        value: false,
+        observer: 'hideTitleChanged'
       }
     },
     ready: function () {
@@ -93,6 +109,9 @@ Design guidelines:
       this.$.addRuleButton.addEventListener('mousedown', function (event) {
         self._addRule();
       });
+    },
+    hideTitleChanged: function (newValue, oldValue) {
+      this.toggleClass("hide-label", newValue, this.$.labelContainer);
     },
     __ruleConfigEmpty: function () {
       return Object.keys(this.ruleConfig).length === 0;
