@@ -172,7 +172,13 @@ Design guidelines:
       var newRule = {
         caption: 'Rule #' + ruleIndex,
         position: ruleIndex,
-        rule: {}
+        rule: {
+          conditions: {
+            kind: "all",
+            conditions: []
+          },
+          actions: []
+        }
       };
 
       this.value.push(newRule);
