@@ -43,24 +43,44 @@ Design guidelines:
       border-width: thin;
       border-style: solid;
     }
+
     .hide-label {
       display: none;
+    }
+
+    .custom-margins {
+      margin: 6px 0;
+    }
+
+    button > span {
+      vertical-align: middle;
+    }
+
+    #moveUpButton,
+    #moveDownButton,
+    #removeBtn {
+      margin: 0 2px;
+    }
+
+    .caption-span {
+      align-self: center;
+      margin: 0 5px;
     }
   </style>
   <template>
     <at-core-theme></at-core-theme>
     <div class="vertical layout">
       <div id="labelContainer">
-        <label>{{label}}</label>
+        <h4 class="custom-margins">{{label}}</h4>
       </div>
     </div>
     <div class="vertical layout">
+      <div id="ruleInsertPoint" class="vertical layout"></div>
       <div class="horizontal layout">
-        <div id="addRuleButton" class="ui button">
-          <at-carbon-icon icon="now:plus"></at-carbon-icon> Add rule ...
-        </div>
-      </div>
-      <div id="ruleInsertPoint" class="vertical layout">
+        <button id="addRuleButton" type="button">
+          <at-carbon-icon icon="now:plus"></at-carbon-icon>
+          <span>Add rule ...</span>
+        </button>
       </div>
     </div>
   </template>
@@ -76,18 +96,17 @@ Design guidelines:
     properties: {
       ruleConfig: {
         type: Object,
-        value: function () {
+        value: function() {
           return {};
         },
         observer: 'ruleConfigChanged'
       },
       value: {
         type: Array,
-        value: function () {
+        value: function() {
           return [];
         },
-        observer: 'valueChanged',
-        notify: true
+        observer: 'valueChanged'
       },
       disabled: {
         type: Boolean,
@@ -104,29 +123,30 @@ Design guidelines:
         observer: 'hideTitleChanged'
       }
     },
-    ready: function () {
+    ready: function() {
       var self = this;
-      this.$.addRuleButton.addEventListener('mousedown', function (event) {
+      this.$.addRuleButton.addEventListener('click', function(event) {
+        event.stopPropagation();
         self._addRule();
       });
     },
-    hideTitleChanged: function (newValue, oldValue) {
+    hideTitleChanged: function(newValue, oldValue) {
       this.toggleClass("hide-label", newValue, this.$.labelContainer);
     },
-    __ruleConfigEmpty: function () {
+    __ruleConfigEmpty: function() {
       return Object.keys(this.ruleConfig).length === 0;
     },
-    __valueEmpty: function () {
+    __valueEmpty: function() {
       return this.value.length === 0;
     },
-    ruleConfigChanged: function (newValue, oldValue) {
+    ruleConfigChanged: function(newValue, oldValue) {
       this.__rebuildHtml();
     },
-    valueChanged: function (newValue, oldValue) {
+    valueChanged: function(newValue, oldValue) {
       this.__rebuildHtml();
     },
-    disabledChanged: function (newValue, oldValue) {
-//      debugger;
+    disabledChanged: function(newValue, oldValue) {
+      //      debugger;
       // update add rule button state
       // update move up / down / remove buttons
       var
@@ -167,7 +187,7 @@ Design guidelines:
       }
 
     },
-    _addRule: function () {
+    _addRule: function() {
       var ruleIndex = this.value.length;
       var newRule = {
         caption: 'Rule #' + ruleIndex,
@@ -183,12 +203,14 @@ Design guidelines:
 
       this.value.push(newRule);
       this.__rebuildHtml();
+      this.fire('value-changed', { value: this.value });
     },
-    _removeRule: function (ruleIndex) {
+    _removeRule: function(ruleIndex) {
       this.value.splice(ruleIndex, 1);
       this.__rebuildHtml();
+      this.fire('value-changed', { value: this.value });
     },
-    _reorderMoveUp: function (ruleIndex) {
+    _reorderMoveUp: function(ruleIndex) {
       var moveToIndex = ruleIndex - 1;
       var tmp;
 
@@ -197,8 +219,9 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
+      this.fire('value-changed', { value: this.value });
     },
-    _reorderMoveDown: function (ruleIndex) {
+    _reorderMoveDown: function(ruleIndex) {
       var moveToIndex = ruleIndex + 1;
       var tmp;
 
@@ -207,9 +230,10 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
+      this.fire('value-changed', { value: this.value });
     },
 
-    __rebuildHtml: function () {
+    __rebuildHtml: function() {
       var
         ruleIndex,
         rule,
@@ -232,7 +256,7 @@ Design guidelines:
         Polymer.dom(this.$.ruleInsertPoint).appendChild(ruleHtml);
       }
     },
-    __buildRuleHtml: function (rule, isFirst, isLast, ruleIndexInValueArray) {
+    __buildRuleHtml: function(rule, isFirst, isLast, ruleIndexInValueArray) {
       var ruleHtml,
         captionActionsDiv,
         captionInput,
@@ -258,111 +282,103 @@ Design guidelines:
       // create the html
 
       ruleHtml = document.createElement('div');
-      ruleHtml.classList.add('vertical');
-      ruleHtml.classList.add('layout');
-      ruleHtml.classList.add('ruleBorder'); // border is for debug purposes
+      Polymer.dom(ruleHtml).classList.add('vertical');
+      Polymer.dom(ruleHtml).classList.add('layout');
+      Polymer.dom(ruleHtml).classList.add('ruleBorder'); // border is for debug purposes
 
       captionActionsDiv = document.createElement('div');
-      captionActionsDiv.classList.add('horizontal');
-      captionActionsDiv.classList.add('layout');
+      Polymer.dom(captionActionsDiv).classList.add('horizontal');
+      Polymer.dom(captionActionsDiv).classList.add('layout');
 
       tmpDiv = document.createElement('div');
+      Polymer.dom(tmpDiv).classList.add('flex');
+      Polymer.dom(tmpDiv).classList.add('horizontal');
+      Polymer.dom(tmpDiv).classList.add('layout');
       tmpSpan = document.createElement('span');
-      tmpSpan.textContent = 'Caption : ';
+      Polymer.dom(tmpSpan).innerHTML = 'Caption: ';
+      Polymer.dom(tmpSpan).classList.add('caption-span');
       captionInput = document.createElement('input');
-      captionInput.setAttribute('type', 'text');
+      Polymer.dom(captionInput).setAttribute('type', 'text');
       captionInput.value = ruleCaptionText;
-      captionInput.classList.add('value');
-      captionInput.setAttribute('data-rule-index', ruleIndexInValueArray);
+      Polymer.dom(captionInput).classList.add('value');
+      Polymer.dom(captionInput).classList.add('flex');
+      Polymer.dom(captionInput).setAttribute('data-rule-index', ruleIndexInValueArray);
       if (this.disabled) {
-        captionInput.setAttribute('disabled', 'disabled');
+        Polymer.dom(captionInput).setAttribute('disabled', 'disabled');
       }
-      captionInput.addEventListener('change', function (event) {
+      captionInput.addEventListener('value-changed', function(event) {
+        event.stopPropagation();
         var ruleIndex = parseInt(captionInput.getAttribute('data-rule-index'));
         self.value[ruleIndex].caption = captionInput.value;
       });
-      tmpDiv.appendChild(tmpSpan);
-      tmpDiv.appendChild(captionInput);
+      Polymer.dom(tmpDiv).appendChild(tmpSpan);
+      Polymer.dom(tmpDiv).appendChild(captionInput);
 
-      captionActionsDiv.appendChild(tmpDiv);
+      Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
 
+      tmpDiv = document.createElement('div');
       if (!isFirst) {
-        tmpDiv = document.createElement('div');
-        moveUpBtn = document.createElement('div');
+        moveUpBtn = document.createElement('button');
 
         icon = document.createElement('at-carbon-icon');
         icon.icon = 'arrow-up';
-        moveUpBtn.appendChild(icon)
+        Polymer.dom(moveUpBtn).appendChild(icon);
 
         moveUpBtn.id = 'moveUpButton';
-        text = document.createTextNode('Move up');
-        moveUpBtn.appendChild(text);
-        moveUpBtn.classList.add('ui');
-        moveUpBtn.classList.add('right');
-        moveUpBtn.classList.add('labeled');
-        moveUpBtn.classList.add('icon');
-        moveUpBtn.classList.add('button');
+        Polymer.dom(moveUpBtn).setAttribute('type', 'button');
+        text = document.createElement('span');
+        Polymer.dom(text).innerHTML = 'Move up';
+        Polymer.dom(moveUpBtn).appendChild(text);
         if (this.disabled) {
-          moveUpBtn.classList.add('disabled');
+          Polymer.dom(moveUpBtn).classList.add('disabled');
         }
-        moveUpBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
-        tmpDiv.appendChild(moveUpBtn);
+        Polymer.dom(moveUpBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+        Polymer.dom(tmpDiv).appendChild(moveUpBtn);
       }
-      captionActionsDiv.appendChild(tmpDiv);
 
       if (!isLast) {
-        tmpDiv = document.createElement('div');
-        moveDownBtn = document.createElement('div');
+        moveDownBtn = document.createElement('button');
 
         icon = document.createElement('at-carbon-icon');
         icon.icon = 'arrow-down';
-        moveDownBtn.appendChild(icon)
+        Polymer.dom(moveDownBtn).appendChild(icon)
 
         moveDownBtn.id = 'moveDownButton';
-        text = document.createTextNode('Move down');
-        moveDownBtn.appendChild(text);
-        moveDownBtn.classList.add('ui');
-        moveDownBtn.classList.add('right');
-        moveDownBtn.classList.add('labeled');
-        moveDownBtn.classList.add('icon');
-        moveDownBtn.classList.add('button');
+        Polymer.dom(moveDownBtn).setAttribute('type', 'button');
+        text = document.createElement('span');
+        Polymer.dom(text).innerHTML = 'Move down';
+        Polymer.dom(moveDownBtn).appendChild(text);
         if (this.disabled) {
-          moveDownBtn.classList.add('disabled');
+          Polymer.dom(moveDownBtn).classList.add('disabled');
         }
-        moveDownBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
-        tmpDiv.appendChild(moveDownBtn);
-
-        captionActionsDiv.appendChild(tmpDiv);
+        Polymer.dom(moveDownBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+        Polymer.dom(tmpDiv).appendChild(moveDownBtn);
       }
 
-      tmpDiv = document.createElement('div');
-      removeBtn = document.createElement('div');
+      removeBtn = document.createElement('button');
 
       icon = document.createElement('at-carbon-icon');
-      icon.icon = 'cancel';
-      removeBtn.appendChild(icon);
+      icon.icon = 'trash';
+      Polymer.dom(removeBtn).appendChild(icon);
 
       removeBtn.id = 'removeBtn';
-      text = document.createTextNode('Remove');
-      removeBtn.appendChild(text);
-      removeBtn.classList.add('ui');
-      removeBtn.classList.add('right');
-      removeBtn.classList.add('labeled');
-      removeBtn.classList.add('icon');
-      removeBtn.classList.add('button');
+      Polymer.dom(removeBtn).setAttribute('type', 'button');
+      text = document.createElement('span');
+      Polymer.dom(text).innerHTML = 'Remove';
+      Polymer.dom(removeBtn).appendChild(text);
       if (this.disabled) {
-        removeBtn.classList.add('disabled');
+        Polymer.dom(removeBtn).classList.add('disabled');
       }
-      removeBtn.setAttribute('data-ruleIndex', ruleIndexInValueArray);
-      tmpDiv.appendChild(removeBtn);
+      Polymer.dom(removeBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+      Polymer.dom(tmpDiv).appendChild(removeBtn);
 
-      captionActionsDiv.appendChild(tmpDiv);
+      Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
 
-      ruleHtml.appendChild(captionActionsDiv);
+      Polymer.dom(ruleHtml).appendChild(captionActionsDiv);
 
       ruleDiv = document.createElement('div');
-      ruleDiv.classList.add('horizontal');
-      ruleDiv.classList.add('layout');
+      Polymer.dom(ruleDiv).classList.add('horizontal');
+      Polymer.dom(ruleDiv).classList.add('layout');
 
       tmpDiv = document.createElement('div');
       atFormRuleElem = document.createElement('at-rule-edit');
@@ -378,16 +394,18 @@ Design guidelines:
         atFormRuleElem.value = rule.rule;
       }
 
-      tmpDiv.appendChild(atFormRuleElem);
+      Polymer.dom(tmpDiv).appendChild(atFormRuleElem);
 
-      ruleDiv.appendChild(tmpDiv);
-      ruleHtml.appendChild(ruleDiv);
+      Polymer.dom(ruleDiv).appendChild(tmpDiv);
+      Polymer.dom(ruleHtml).appendChild(ruleDiv);
 
       // setup event listeners
 
       if (moveUpBtn) {
-        moveUpBtn.addEventListener('click', function (event) {
-          var ruleIndex = event.target.getAttribute('data-ruleIndex');
+        moveUpBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          var target = event.currentTarget;
+          var ruleIndex = target.getAttribute('data-ruleIndex');
           ruleIndex = parseInt(ruleIndex);
           self._reorderMoveUp(ruleIndex);
           return false;
@@ -395,16 +413,20 @@ Design guidelines:
       }
 
       if (moveDownBtn) {
-        moveDownBtn.addEventListener('click', function (event) {
-          var ruleIndex = event.target.getAttribute('data-ruleIndex');
+        moveDownBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          var target = event.currentTarget;
+          var ruleIndex = target.getAttribute('data-ruleIndex');
           ruleIndex = parseInt(ruleIndex);
           self._reorderMoveDown(ruleIndex);
           return false;
         });
       }
 
-      removeBtn.addEventListener('click', function (event) {
-        var ruleIndex = event.target.getAttribute('data-ruleIndex');
+      removeBtn.addEventListener('click', function(event) {
+        event.stopPropagation();
+        var target = event.currentTarget;
+        var ruleIndex = target.getAttribute('data-ruleIndex');
         ruleIndex = parseInt(ruleIndex);
         self._removeRule(ruleIndex);
         return false;
