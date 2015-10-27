@@ -66,6 +66,30 @@ Design guidelines:
       align-self: center;
       margin: 0 5px;
     }
+
+    .caption-input {
+      font-family: 'Segoe UI', 'Segoe WP', 'Roboto', 'Frutiger', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin-right: 5px;
+      outline: none;
+      -webkit-appearance: none;
+      -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+      line-height: 1.2142em;
+      padding: 0.67861em 1em;
+      font-size: 1em;
+      background: #ffffff;
+      border: 1px solid rgba(39, 41, 43, 0.15);
+      color: #212121;
+      border-radius: 2px;
+      box-shadow: 0em 0em 0em 0em transparent inset;
+      -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    at-carbon-icon {
+      height: 16px;
+      width: 16px;
+    }
+
   </style>
   <template>
     <at-core-theme></at-core-theme>
@@ -302,6 +326,7 @@ Design guidelines:
       captionInput.value = ruleCaptionText;
       Polymer.dom(captionInput).classList.add('value');
       Polymer.dom(captionInput).classList.add('flex');
+      Polymer.dom(captionInput).classList.add('caption-input');
       Polymer.dom(captionInput).setAttribute('data-rule-index', ruleIndexInValueArray);
       if (this.disabled) {
         Polymer.dom(captionInput).setAttribute('disabled', 'disabled');
