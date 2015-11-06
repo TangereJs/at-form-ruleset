@@ -89,7 +89,6 @@ Design guidelines:
       height: 16px;
       width: 16px;
     }
-
   </style>
   <template>
     <at-core-theme></at-core-theme>
@@ -229,12 +228,16 @@ Design guidelines:
 
       this.value.push(newRule);
       this.__rebuildHtml();
-      this.fire('value-changed', { value: this.value });
+      this.fire('value-changed', {
+        value: this.value
+      });
     },
     _removeRule: function(ruleIndex) {
       this.value.splice(ruleIndex, 1);
       this.__rebuildHtml();
-      this.fire('value-changed', { value: this.value });
+      this.fire('value-changed', {
+        value: this.value
+      });
     },
     _reorderMoveUp: function(ruleIndex) {
       var moveToIndex = ruleIndex - 1;
@@ -245,7 +248,9 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
-      this.fire('value-changed', { value: this.value });
+      this.fire('value-changed', {
+        value: this.value
+      });
     },
     _reorderMoveDown: function(ruleIndex) {
       var moveToIndex = ruleIndex + 1;
@@ -256,7 +261,9 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
-      this.fire('value-changed', { value: this.value });
+      this.fire('value-changed', {
+        value: this.value
+      });
     },
 
     __rebuildHtml: function() {
@@ -266,7 +273,10 @@ Design guidelines:
         ruleHtml,
         isFirst, isLast;
 
-      if (this._isReady && this.__ruleConfigEmpty()) {
+      if (!this._isReady) {
+        return;
+      }
+      if (this.__ruleConfigEmpty()) {
         console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
         return;
       }
