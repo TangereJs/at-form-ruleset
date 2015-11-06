@@ -147,12 +147,14 @@ Design guidelines:
         observer: 'hideTitleChanged'
       }
     },
+    _isReady: false,
     ready: function() {
       var self = this;
       this.$.addRuleButton.addEventListener('click', function(event) {
         event.stopPropagation();
         self._addRule();
       });
+      this._isReady = true;
     },
     hideTitleChanged: function(newValue, oldValue) {
       this.toggleClass("hide-label", newValue, this.$.labelContainer);
@@ -264,7 +266,7 @@ Design guidelines:
         ruleHtml,
         isFirst, isLast;
 
-      if (this.__ruleConfigEmpty()) {
+      if (this._isReady && this.__ruleConfigEmpty()) {
         console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
         return;
       }
