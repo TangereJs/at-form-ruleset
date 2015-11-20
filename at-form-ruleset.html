@@ -140,10 +140,10 @@ Design guidelines:
         type: String,
         value: 'Ruleset: '
       },
-      hideTitle: {
+      hideLabel: {
         type: Boolean,
         value: false,
-        observer: 'hideTitleChanged'
+        observer: 'hideLabelChanged'
       }
     },
     _isReady: false,
@@ -155,7 +155,7 @@ Design guidelines:
       });
       this._isReady = true;
     },
-    hideTitleChanged: function(newValue, oldValue) {
+    hideLabelChanged: function(newValue, oldValue) {
       this.toggleClass("hide-label", newValue, this.$.labelContainer);
     },
     __ruleConfigEmpty: function() {
