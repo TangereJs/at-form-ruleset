@@ -44,7 +44,7 @@ Design guidelines:
       border-style: solid;
     }
 
-    .hide-label {
+    .hidden {
       display: none;
     }
 
@@ -92,18 +92,20 @@ Design guidelines:
   </style>
   <template>
     <at-core-theme></at-core-theme>
-    <div class="vertical layout">
-      <div id="labelContainer">
-        <h4 class="custom-margins">{{label}}</h4>
+    <div id="atFormRulesetWrapper">
+      <div class="vertical layout">
+        <div id="labelContainer">
+          <h4 class="custom-margins">{{label}}</h4>
+        </div>
       </div>
-    </div>
-    <div class="vertical layout">
-      <div id="ruleInsertPoint" class="vertical layout"></div>
-      <div class="horizontal layout">
-        <button id="addRuleButton" type="button">
-          <at-carbon-icon icon="now:plus"></at-carbon-icon>
-          <span>Add rule ...</span>
-        </button>
+      <div class="vertical layout">
+        <div id="ruleInsertPoint" class="vertical layout"></div>
+        <div class="horizontal layout">
+          <button id="addRuleButton" type="button">
+            <at-carbon-icon icon="now:plus"></at-carbon-icon>
+            <span>Add rule ...</span>
+          </button>
+        </div>
       </div>
     </div>
   </template>
@@ -144,9 +146,24 @@ Design guidelines:
         type: Boolean,
         value: false,
         observer: 'hideLabelChanged'
+      },
+      /**
+       * Hides the element. When hidden nothing is displayed for the element
+       * @property hide
+       * @type Boolean
+       * @default false
+       */
+      hide: {
+        type: Boolean,
+        value: false,
+        observer: 'hideChanged'
       }
     },
     _isReady: false,
+    hideChanged: function (newValue, oldValue) {
+      var wrapper = this.$.atFormRulesetWrapper;
+      this.toggleClass('hidden', newValue, wrapper);
+    },
     ready: function() {
       var self = this;
       this.$.addRuleButton.addEventListener('click', function(event) {
@@ -156,7 +173,7 @@ Design guidelines:
       this._isReady = true;
     },
     hideLabelChanged: function(newValue, oldValue) {
-      this.toggleClass("hide-label", newValue, this.$.labelContainer);
+      this.toggleClass("hidden", newValue, this.$.labelContainer);
     },
     __ruleConfigEmpty: function() {
       return Object.keys(this.ruleConfig).length === 0;
