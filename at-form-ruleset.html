@@ -89,6 +89,9 @@ Design guidelines:
       height: 16px;
       width: 16px;
     }
+    #hideThisWhenPropertiesAreEmpty.hidden {
+      display: none;
+    }
   </style>
   <template>
     <at-core-theme></at-core-theme>
@@ -98,7 +101,7 @@ Design guidelines:
           <h4 class="custom-margins">{{label}}</h4>
         </div>
       </div>
-      <div class="vertical layout">
+      <div id="hideThisWhenPropertiesAreEmpty" class="vertical layout">
         <div id="ruleInsertPoint" class="vertical layout"></div>
         <div class="horizontal layout">
           <button id="addRuleButton" type="button">
@@ -176,7 +179,7 @@ Design guidelines:
       this.toggleClass("hidden", newValue, this.$.labelContainer);
     },
     __ruleConfigEmpty: function() {
-      return Object.keys(this.ruleConfig).length === 0;
+      return Object.keys(this.ruleConfig).length === 0 || Object.keys(this.ruleConfig.properties).length === 0;
     },
     __valueEmpty: function() {
       return this.value.length === 0;
@@ -295,7 +298,12 @@ Design guidelines:
       }
       if (this.__ruleConfigEmpty()) {
         console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
+        this.toggleClass('hidden', true, this.$.hideThisWhenPropertiesAreEmpty);
+        this.label = "Provide rule config for ruleset. Ruleset can not function correctly without rule config";
         return;
+      } else {
+        this.label = "";
+        this.toggleClass('hidden', false, this.$.hideThisWhenPropertiesAreEmpty);
       }
 
       Polymer.dom(this.$.ruleInsertPoint).innerHTML = '';
