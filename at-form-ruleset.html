@@ -1,6 +1,7 @@
+<link rel="import" href="../tangere/tangere.html">
 <link rel="import" href="../layout/layout.html">
 <link rel="import" href="../at-rule-edit/at-rule-edit.html">
-<link rel="import" href="../at-core-theme/at-core-theme.html">
+<link rel="import" href="../at-theme/at-theme.html">
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html">
 <!--
 What this component does:
@@ -36,65 +37,66 @@ Design guidelines:
 -->
 
 <dom-module id="at-form-ruleset">
-  <style>
-    .ruleBorder {
-      margin: 2px;
-      /*border-color: #aaa;*/
-      /*border-width: thin;*/
-      /*border-style: solid;*/
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .custom-margins {
-      margin: 6px 0;
-    }
-
-    button > span {
-      vertical-align: middle;
-    }
-
-    #moveUpButton,
-    #moveDownButton,
-    #removeBtn {
-      margin: 0 2px;
-    }
-
-    .caption-span {
-      align-self: center;
-      margin: 0 5px;
-    }
-
-    .caption-input {
-      font-family: 'Segoe UI', 'Segoe WP', 'Roboto', 'Frutiger', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      margin-right: 5px;
-      outline: none;
-      -webkit-appearance: none;
-      -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-      line-height: 1.2142em;
-      padding: 0.67861em 1em;
-      font-size: 1em;
-      background: #ffffff;
-      border: 1px solid rgba(39, 41, 43, 0.15);
-      color: #212121;
-      border-radius: 2px;
-      box-shadow: 0em 0em 0em 0em transparent inset;
-      -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-
-    at-carbon-icon {
-      height: 16px;
-      width: 16px;
-    }
-    #hideThisWhenPropertiesAreEmpty.hidden {
-      display: none;
-    }
-  </style>
   <template>
-    <at-core-theme></at-core-theme>
+    <style>
+      .ruleBorder {
+        margin: 2px;
+        /*border-color: #aaa;*/
+        /*border-width: thin;*/
+        /*border-style: solid;*/
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .custom-margins {
+        margin: 6px 0;
+      }
+
+      button> span {
+        vertical-align: middle;
+      }
+
+      #moveUpButton,
+      #moveDownButton,
+      #removeBtn {
+        margin: 0 2px;
+      }
+
+      .caption-span {
+        align-self: center;
+        margin: 0 5px;
+      }
+
+      .caption-input {
+        font-family: 'Segoe UI', 'Segoe WP', 'Roboto', 'Frutiger', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        margin-right: 5px;
+        outline: none;
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        line-height: 1.2142em;
+        padding: 0.67861em 1em;
+        font-size: 1em;
+        background: #ffffff;
+        border: 1px solid rgba(39, 41, 43, 0.15);
+        color: #212121;
+        border-radius: 2px;
+        box-shadow: 0em 0em 0em 0em transparent inset;
+        -webkit-transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      at-carbon-icon {
+        height: 16px;
+        width: 16px;
+      }
+
+      #hideThisWhenPropertiesAreEmpty.hidden {
+        display: none;
+      }
+    </style>
+
     <div id="atFormRulesetWrapper">
       <div class="vertical layout">
         <div id="labelContainer">
@@ -120,7 +122,6 @@ Design guidelines:
   // use case is that one ruleset should be built for a single schema; multiple rules share a single schema but each rule has its own data
   Polymer({
     is: 'at-form-ruleset',
-    _scopeCssViaAttr: true,
     properties: {
       ruleConfig: {
         type: Object,
@@ -163,7 +164,7 @@ Design guidelines:
       }
     },
     _isReady: false,
-    hideChanged: function (newValue, oldValue) {
+    hideChanged: function(newValue, oldValue) {
       var wrapper = this.$.atFormRulesetWrapper;
       this.toggleClass('hidden', newValue, wrapper);
     },
