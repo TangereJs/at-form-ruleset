@@ -256,14 +256,13 @@
 
         test('invalid value values', function () {
           var fixtureSelectors = [ 'value', 'valueEmptyString', 'valueUndefined', 'valueNull', 'valueTrue', 'valueFalse', 'value42', 'value3.14159', 'value{}', 'valueFunction' ];
-          var expectedValues = [ [], "", "undefined", null, true, false, 42, 3.14159, {}, "function() { return undefined; }" ];
+          var expectedValues = [ [], null, null, null, true, false, 42, 3.14159, {}, null ];
 
           fixtureSelectors.forEach(function (selector, index) {
             var element = fixture(selector);
             var expectedValue = expectedValues[index];
 
             assert.equal(true, areEqual({}, element.ruleConfig), "rule config not set correctly");
-            debugger;
             assert.equal(true, areEqual(expectedValue, element.value, "value not set correctly"));
           });
 
