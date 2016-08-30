@@ -123,34 +123,42 @@ Design guidelines:
   Polymer({
     is: 'at-form-ruleset',
     properties: {
-      ruleConfig: {
-        type: Object,
-        value: function() {
-          return {};
-        },
-        observer: 'ruleConfigChanged'
-      },
-      value: {
-        type: Array,
-        value: function() {
-          return [];
-        },
-        observer: 'valueChanged'
-      },
-      disabled: {
-        type: Boolean,
-        value: false,
-        observer: 'disabledChanged'
-      },
+
+      /**
+       *
+       * @property
+       * @type
+       * @default
+       */
       label: {
         type: String,
         value: ''
       },
+
+      /**
+       *
+       * @property
+       * @type
+       * @default
+       */
       hideLabel: {
         type: Boolean,
         value: false,
-        observer: 'hideLabelChanged'
+        observer: '_hideLabelChanged'
       },
+
+      /**
+       *
+       * @property
+       * @type
+       * @default
+       */
+      disabled: {
+        type: Boolean,
+        value: false,
+        observer: '_disabledChanged'
+      },
+
       /**
        * Hides the element. When hidden nothing is displayed for the element
        * @property hide
@@ -160,14 +168,43 @@ Design guidelines:
       hide: {
         type: Boolean,
         value: false,
-        observer: 'hideChanged'
+        observer: '_hideChanged'
+      },
+
+      /**
+       *
+       * @property
+       * @type
+       * @default
+       */
+      ruleConfig: {
+        type: Object,
+        value: function() {
+          return {};
+        },
+        observer: '_ruleConfigChanged'
+      },
+
+      /**
+       *
+       * @property
+       * @type
+       * @default
+       */
+      value: {
+        type: Array,
+        value: function() {
+          return [];
+        },
+        observer: '_valueChanged'
       }
+
     },
-    _isReady: false,
-    hideChanged: function(newValue, oldValue) {
-      var wrapper = this.$.atFormRulesetWrapper;
-      this.toggleClass('hidden', newValue, wrapper);
+
+    _hideLabelChanged: function(newValue, oldValue) {
+      this.toggleClass("hidden", newValue, this.$.labelContainer);
     },
+
     ready: function() {
       var self = this;
       this.$.addRuleButton.addEventListener('click', function(event) {
@@ -176,22 +213,8 @@ Design guidelines:
       });
       this._isReady = true;
     },
-    hideLabelChanged: function(newValue, oldValue) {
-      this.toggleClass("hidden", newValue, this.$.labelContainer);
-    },
-    __ruleConfigEmpty: function() {
-      return Object.keys(this.ruleConfig).length === 0 || Object.keys(this.ruleConfig.properties).length === 0;
-    },
-    __valueEmpty: function() {
-      return this.value.length === 0;
-    },
-    ruleConfigChanged: function(newValue, oldValue) {
-      this.__rebuildHtml();
-    },
-    valueChanged: function(newValue, oldValue) {
-      this.__rebuildHtml();
-    },
-    disabledChanged: function(newValue, oldValue) {
+
+    _disabledChanged: function(newValue, oldValue) {
       //      debugger;
       // update add rule button state
       // update move up / down / remove buttons
@@ -233,6 +256,20 @@ Design guidelines:
       }
 
     },
+
+    _hideChanged: function(newValue, oldValue) {
+      var wrapper = this.$.atFormRulesetWrapper;
+      this.toggleClass('hidden', newValue, wrapper);
+    },
+
+    _ruleConfigChanged: function(newValue, oldValue) {
+      this.__rebuildHtml();
+    },
+
+    _valueChanged: function(newValue, oldValue) {
+      this.__rebuildHtml();
+    },
+
     _addRule: function() {
       var ruleIndex = this.value.length;
       var newRule = {
@@ -249,16 +286,12 @@ Design guidelines:
 
       this.value.push(newRule);
       this.__rebuildHtml();
-      this.fire('value-changed', {
-        value: this.value
-      });
+      this._fireValueChangedEvent(this.value);
     },
     _removeRule: function(ruleIndex) {
       this.value.splice(ruleIndex, 1);
       this.__rebuildHtml();
-      this.fire('value-changed', {
-        value: this.value
-      });
+      this._fireValueChangedEvent(this.value);
     },
     _reorderMoveUp: function(ruleIndex) {
       var moveToIndex = ruleIndex - 1;
@@ -269,9 +302,7 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
-      this.fire('value-changed', {
-        value: this.value
-      });
+      this._fireValueChangedEvent(this.value);
     },
     _reorderMoveDown: function(ruleIndex) {
       var moveToIndex = ruleIndex + 1;
@@ -282,8 +313,14 @@ Design guidelines:
       this.value[moveToIndex] = tmp;
 
       this.__rebuildHtml();
+      this._fireValueChangedEvent(this.value);
+    },
+
+    _fireValueChangedEvent: function (value) {
       this.fire('value-changed', {
         value: this.value
+      }, {
+        bubbles: false
       });
     },
 
@@ -294,10 +331,15 @@ Design guidelines:
         ruleHtml,
         isFirst, isLast;
 
+      function ruleConfigEmpty(ruleConfig) {
+        return Object.keys(ruleConfig).length === 0 || Object.keys(ruleConfig.properties).length === 0;
+      }
+
       if (!this._isReady) {
         return;
       }
-      if (this.__ruleConfigEmpty()) {
+
+      if (ruleConfigEmpty(this.ruleConfig)) {
         console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
         this.toggleClass('hidden', true, this.$.hideThisWhenPropertiesAreEmpty);
         this.label = "Provide rule config for ruleset. Ruleset can not function correctly without rule config";
