@@ -58,6 +58,14 @@ Design guidelines:
         vertical-align: middle;
       }
 
+      input[disabled] {
+        opacity: 0.4;
+      }
+
+      button[disabled] {
+        opacity: 0.4;
+      }
+
       #moveUpButton,
       #moveDownButton,
       #removeBtn {
@@ -125,10 +133,10 @@ Design guidelines:
     properties: {
 
       /**
-       *
-       * @property
-       * @type
-       * @default
+       * Elements label
+       * @property label
+       * @type String
+       * @default ""
        */
       label: {
         type: String,
@@ -136,10 +144,10 @@ Design guidelines:
       },
 
       /**
-       *
-       * @property
-       * @type
-       * @default
+       * When true label is hidden
+       * @property hideLabel
+       * @type Boolean
+       * @default false
        */
       hideLabel: {
         type: Boolean,
@@ -148,10 +156,10 @@ Design guidelines:
       },
 
       /**
-       *
-       * @property
-       * @type
-       * @default
+       * When true element is disabled; user input is not possible
+       * @property disabled
+       * @type Boolean
+       * @default false
        */
       disabled: {
         type: Boolean,
@@ -172,10 +180,10 @@ Design guidelines:
       },
 
       /**
-       *
-       * @property
-       * @type
-       * @default
+       * Element configuration; for conditions and actions
+       * @property ruleConfig
+       * @type Object
+       * @default {}
        */
       ruleConfig: {
         type: Object,
@@ -186,10 +194,10 @@ Design guidelines:
       },
 
       /**
-       *
-       * @property
-       * @type
-       * @default
+       * Element's value
+       * @property value
+       * @type Array
+       * @default []
        */
       value: {
         type: Array,
@@ -229,27 +237,19 @@ Design guidelines:
         ruleEdit,
         ruleEdits;
 
-      uiButtons = this.querySelectorAll('.ui.button');
+      uiButtons = Polymer.dom(this.root).querySelectorAll('button');
       for (uiButtonIndex = 0; uiButtonIndex < uiButtons.length; uiButtonIndex += 1) {
-        if (newValue) {
-          uiButtons[uiButtonIndex].classList.add('disabled');
-        } else {
-          uiButtons[uiButtonIndex].classList.remove('disabled');
-        }
+        this.toggleAttribute('disabled', newValue, uiButtons[uiButtonIndex]);
       }
 
       // update caption input field
-      captionInputs = this.querySelectorAll('input');
+      captionInputs = Polymer.dom(this.root).querySelectorAll('input');
       for (captionInputIndex = 0; captionInputIndex < captionInputs.length; captionInputIndex += 1) {
-        if (newValue) {
-          captionInputs[captionInputIndex].setAttribute('disabled', 'disabled');
-        } else {
-          captionInputs[captionInputIndex].removeAttribute('disabled');
-        }
+        this.toggleAttribute('disabled', newValue, captionInputs[captionInputIndex]);
       }
 
       // disable the at-rule-edit elements
-      ruleEdits = this.querySelectorAll('at-rule-edit');
+      ruleEdits = Polymer.dom(this.$.ruleInsertPoint).querySelectorAll('at-rule-edit');
       for (ruleEditIndex = 0; ruleEditIndex < ruleEdits.length; ruleEditIndex += 1) {
         ruleEdit = ruleEdits[ruleEditIndex];
         ruleEdit.disabled = newValue;
@@ -263,10 +263,58 @@ Design guidelines:
     },
 
     _ruleConfigChanged: function(newValue, oldValue) {
+
+      function isString(obj) {
+        return Object.prototype.toString.call(obj) === "[object String]";
+      }
+
+      function isObject(obj) {
+        return Object.prototype.toString.call(obj) === "[object Object]";
+      }
+
+      if (isString(newValue))
+      {
+        try {
+          var parsedConfig = JSON.parse(newValue);
+          this.ruleConfig = parsedConfig;
+        } catch (e) {
+          console.log(e);
+        }
+        return;
+      }
+
+      if (!isObject(newValue)) {
+        return;
+      }
+
       this.__rebuildHtml();
     },
 
     _valueChanged: function(newValue, oldValue) {
+
+      function isString(obj) {
+        return Object.prototype.toString.call(obj) === "[object String]";
+      }
+
+      function isArray(obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";
+      }
+
+      if (isString(newValue))
+      {
+        try {
+          var parsedConfig = JSON.parse(newValue);
+          this.ruleConfig = parsedConfig;
+        } catch (e) {
+          console.log(e);
+        }
+        return;
+      }
+
+      if (!isArray(newValue)) {
+        return;
+      }
+
       this.__rebuildHtml();
     },
 
@@ -408,9 +456,7 @@ Design guidelines:
       Polymer.dom(captionInput).classList.add('flex');
       Polymer.dom(captionInput).classList.add('caption-input');
       Polymer.dom(captionInput).setAttribute('data-rule-index', ruleIndexInValueArray);
-      if (this.disabled) {
-        Polymer.dom(captionInput).setAttribute('disabled', 'disabled');
-      }
+      this.toggleAttribute('disabled', this.disabled, captionInput);
       captionInput.addEventListener('value-changed', function(event) {
         event.stopPropagation();
         var ruleIndex = parseInt(captionInput.getAttribute('data-rule-index'));
@@ -434,9 +480,7 @@ Design guidelines:
         text = document.createElement('span');
         Polymer.dom(text).innerHTML = 'Move up';
         Polymer.dom(moveUpBtn).appendChild(text);
-        if (this.disabled) {
-          Polymer.dom(moveUpBtn).classList.add('disabled');
-        }
+        this.toggleAttribute('disabled', this.disabled, moveUpBtn);
         Polymer.dom(moveUpBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
         Polymer.dom(tmpDiv).appendChild(moveUpBtn);
       }
@@ -453,9 +497,7 @@ Design guidelines:
         text = document.createElement('span');
         Polymer.dom(text).innerHTML = 'Move down';
         Polymer.dom(moveDownBtn).appendChild(text);
-        if (this.disabled) {
-          Polymer.dom(moveDownBtn).classList.add('disabled');
-        }
+        this.toggleAttribute('disabled', this.disabled, moveDownBtn);
         Polymer.dom(moveDownBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
         Polymer.dom(tmpDiv).appendChild(moveDownBtn);
       }
@@ -471,9 +513,7 @@ Design guidelines:
       text = document.createElement('span');
       Polymer.dom(text).innerHTML = 'Remove';
       Polymer.dom(removeBtn).appendChild(text);
-      if (this.disabled) {
-        Polymer.dom(removeBtn).classList.add('disabled');
-      }
+      this.toggleAttribute('disabled', this.disabled, removeBtn);
       Polymer.dom(removeBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
       Polymer.dom(tmpDiv).appendChild(removeBtn);
 

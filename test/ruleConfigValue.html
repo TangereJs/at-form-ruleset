@@ -1,0 +1,281 @@
+<!doctype html>
+<html>
+
+<head>
+
+  <title>at-form-ruleset tests</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../iron-test-helpers/test-helpers.js"></script>
+  <script src="../../iron-test-helpers/mock-interactions.js"></script>
+
+  <link rel="import" href="../at-form-ruleset.html">
+
+</head>
+
+<body>
+
+  <test-fixture id="ruleConfig">
+    <template>
+      <at-form-ruleset></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigEmptyString">
+    <template>
+      <at-form-ruleset rule-config=""></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigUndefined">
+    <template>
+      <at-form-ruleset rule-config="undefined"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigNull">
+    <template>
+      <at-form-ruleset rule-config="null"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigTrue">
+    <template>
+      <at-form-ruleset rule-config="true"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigFalse">
+    <template>
+      <at-form-ruleset rule-config="false"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfig42">
+    <template>
+      <at-form-ruleset rule-config="42"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfig3.14159">
+    <template>
+      <at-form-ruleset rule-config="3.14159"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfig[]">
+    <template>
+      <at-form-ruleset rule-config="[]"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="ruleConfigFunction">
+    <template>
+      <at-form-ruleset rule-config="function() { return undefined; }"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="value">
+    <template>
+      <at-form-ruleset></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueEmptyString">
+    <template>
+      <at-form-ruleset value=""></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueUndefined">
+    <template>
+      <at-form-ruleset value="undefined"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueNull">
+    <template>
+      <at-form-ruleset value="null"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueTrue">
+    <template>
+      <at-form-ruleset value="true"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueFalse">
+    <template>
+      <at-form-ruleset value="false"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="value42">
+    <template>
+      <at-form-ruleset value="42"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="value3.14159">
+    <template>
+      <at-form-ruleset value="3.14159"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="value{}">
+    <template>
+      <at-form-ruleset value="{}"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="valueFunction">
+    <template>
+      <at-form-ruleset value="function() { return undefined; }"></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="propertyTests">
+    <template>
+      <at-form-ruleset></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('rule config and value tests', function () {
+
+      function isArray(obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";
+      }
+
+      function isObject(obj) {
+        return Object.prototype.toString.call(obj) === "[object Object]";
+      }
+
+      function isFunction(obj) {
+        return Object.prototype.toString.call(obj) === "[object Function]";
+      }
+
+      function areEqual(obj1, obj2) {
+        var result = false;
+        var obj1PropertyValue;
+        var obj2PropertyValue;
+
+        if (isArray(obj1) && isArray(obj2)) {
+          result = obj1.length === obj2.length;
+          // if lengths are different return false
+          if(!result) {
+            return result;
+          }
+
+          // else compare items in the arrays for equality
+          for (var i = 0; i < obj1.length && result; i++) {
+            obj1PropertyValue = obj1[i];
+            obj2PropertyValue = obj2[i];
+            result = areEqual(obj1PropertyValue, obj2PropertyValue);
+          }
+        } else if (isObject(obj1) && isObject(obj2)) {
+          var obj1Properties = Object.keys(obj1);
+          var obj2Properties = Object.keys(obj2);
+          // tests that these arrays have same lengths and same names
+          result = areEqual(obj1Properties, obj2Properties);
+
+          if (!result) {
+            return result;
+          }
+          // test that every property in both objects has same value
+          for (var j = 0; j < obj1Properties.length && result; j++) {
+            var obj1PropertyName = obj1Properties[j];
+            var obj2PropertyName = obj2Properties[j];
+            obj1PropertyValue = obj1[obj1PropertyName];
+            obj2PropertyValue = obj2[obj2PropertyName];
+            result = areEqual(obj1PropertyValue, obj2PropertyValue);
+          }
+        } else if (isFunction(obj1) && isFunction(obj2)) {
+          result = obj1.toString() === obj2.toString();
+        } else {
+          // this tests string, number, boolean, null and undefined
+          result = obj1 === obj2;
+        }
+
+        return result;
+      }
+
+      function getComputedStylePropertyValue(element, propertyName) {
+        return window.getComputedStyle(element).getPropertyValue(propertyName);
+      }
+
+      function assertDisabledState(element, expectedValue) {
+        var root = Polymer.dom(element.root);
+
+        var buttons = root.querySelectorAll('button');
+        buttons.forEach(function (button, index) {
+          assert.equal(expectedValue, button.hasAttribute('disabled'), "disabled attribute not set");
+        });
+
+        var inputs = root.querySelectorAll('input');
+        inputs.forEach(function (input, index) {
+          assert.equal(expectedValue, input.hasAttribute('disabled'), "disabled attribute not set");
+        });
+
+        var atRuleEdits = root.querySelectorAll('at-rule-edit');
+        atRuleEdits.forEach(function (atRuleEdit, index) {
+          assert.equal(expectedValue, atRuleEdit.disabled, "disabled property not set");
+        });
+      }
+
+      function getRuleConfig() {
+        return { "properties": { "value": { "type": "string", "title": "Value" } } };
+      }
+
+      function getValue() {
+        return [{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
+      }
+
+      suite('tests where property values are set as attributes', function () {
+
+        test('invalid ruleConfig values', function () {
+          var fixtureSelectors = [ 'ruleConfig', 'ruleConfigEmptyString', 'ruleConfigUndefined', 'ruleConfigNull', 'ruleConfigTrue', 'ruleConfigFalse', 'ruleConfig42', 'ruleConfig3.14159', 'ruleConfig[]', 'ruleConfigFunction' ];
+          var expectedRuleConfigs = [ {}, "", "undefined", null, true, false, 42, 3.14159, [], "function() { return undefined; }" ];
+
+          fixtureSelectors.forEach(function (selector, index) {
+            var element = fixture(selector);
+            var expectedConfig = expectedRuleConfigs[index];
+
+            assert.equal(true, areEqual(expectedConfig, element.ruleConfig), "rule config not set correctly");
+            assert.equal(true, areEqual([], element.value, "value not set correctly"));
+          });
+
+        });
+
+        test('invalid value values', function () {
+          var fixtureSelectors = [ 'value', 'valueEmptyString', 'valueUndefined', 'valueNull', 'valueTrue', 'valueFalse', 'value42', 'value3.14159', 'value{}', 'valueFunction' ];
+          var expectedValues = [ [], "", "undefined", null, true, false, 42, 3.14159, {}, "function() { return undefined; }" ];
+
+          fixtureSelectors.forEach(function (selector, index) {
+            var element = fixture(selector);
+            var expectedValue = expectedValues[index];
+
+            assert.equal(true, areEqual({}, element.ruleConfig), "rule config not set correctly");
+            debugger;
+            assert.equal(true, areEqual(expectedValue, element.value, "value not set correctly"));
+          });
+
+        });
+
+      });
+
+      suite('tests where property values are set in code', function () {
+
+      });
+    });
+  </script>
+</body>
+
+</html>
