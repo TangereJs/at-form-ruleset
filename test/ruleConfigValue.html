@@ -141,6 +141,48 @@
     </template>
   </test-fixture>
 
+  <test-fixture id="ruleConfigValidValueValid">
+    <template>
+      <at-form-ruleset rule-config='{ "properties": { "value": { "type": "string", "title": "Value" } } }' value='[{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }]'></at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="addNew">
+    <template>
+      <at-form-ruleset
+        rule-config='{ "properties": { "value": { "type": "string", "title": "Value" } } }'
+        value='[{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }]'>
+      </at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="moveDown">
+    <template>
+      <at-form-ruleset
+        rule-config='{ "properties": { "value": { "type": "string", "title": "Value" } } }'
+        value='[{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }]'>
+      </at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="moveUp">
+    <template>
+      <at-form-ruleset
+        rule-config='{ "properties": { "value": { "type": "string", "title": "Value" } } }'
+        value='[{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }]'>
+      </at-form-ruleset>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="remove">
+    <template>
+      <at-form-ruleset
+        rule-config='{ "properties": { "value": { "type": "string", "title": "Value" } } }'
+        value='[{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }, { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }]'>
+      </at-form-ruleset>
+    </template>
+  </test-fixture>
+
   <test-fixture id="propertyTests">
     <template>
       <at-form-ruleset></at-form-ruleset>
@@ -238,6 +280,40 @@
         return [{ "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
       }
 
+      function getAddNewValue() {
+        return [
+          { "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Rule #1", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }
+        ];
+      }
+
+      function getValue3() {
+        return [
+          { "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
+      }
+
+      function getMoveDownValue() {
+        return [
+          { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
+      }
+
+      function getMoveUpValue() {
+        return [
+          { "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Bwahahaha!", "position": 1, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
+      }
+
+      function getRemoveValue() {
+        return [
+          { "caption": "Mwahahaha!", "position": 0, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } },
+          { "caption": "Owahahaha!", "position": 2, "rule": { "conditions": { "kind": "all", "conditions": [] }, "actions": [] } }];
+      }
+
       suite('tests where property values are set as attributes', function () {
 
         test('invalid ruleConfig values', function () {
@@ -268,9 +344,156 @@
 
         });
 
+        test('valid ruleConfig valid value', function () {
+          var element = fixture('ruleConfigValidValueValid');
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue(), element.value), 'value not set correctly');
+        });
+
+        test('add new valid ruleConfig valid value', function () {
+          var element = fixture('addNew');
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue(), element.value), 'value not set correctly');
+
+          element._addRule();
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getAddNewValue(), element.value), 'value not set correctly');
+        });
+
+        test('reorder move down valid ruleConfig valid value', function () {
+          var element = fixture('moveDown');
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._reorderMoveDown(0);
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getMoveDownValue(), element.value), 'value not set correctly');
+        });
+
+        test('reorder move up valid ruleConfig valid value', function () {
+          var element = fixture('moveUp');
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._reorderMoveUp(2);
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getMoveUpValue(), element.value), 'value not set correctly');
+        });
+
+        test('remove valid ruleConfig valid value', function () {
+          var element = fixture('remove');
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._removeRule(1);
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getRemoveValue(), element.value), 'value not set correctly');
+        });
+
       });
 
       suite('tests where property values are set in code', function () {
+
+        test('invalid ruleConfig values', function () {
+          var element = fixture('propertyTests');
+          var invalidRuleConfigs = [ undefined, null, "", "undefined", "null", true, false, "true", "false", 42, "42", 3.14159, "3.14159", [], "[]", function() { return undefined; }];
+          var expectedRuleConfigs = [ undefined, null, "", "undefined", null, true, false, true, false, 42, 42, 3.14159, 3.14159, [], [], function() { return undefined; } ];
+
+          invalidRuleConfigs.forEach(function (invalidRuleConfig, index) {
+            element.ruleConfig = invalidRuleConfig;
+            var expectedConfig = expectedRuleConfigs[index];
+
+            assert.equal(true, areEqual(expectedConfig, element.ruleConfig), "rule config not set correctly");
+            assert.equal(true, areEqual([], element.value, "value not set correctly"));
+          });
+
+        });
+
+        test('invalid value values', function () {
+          var element = fixture('propertyTests');
+          var invalidValues = [ undefined, null, "", "undefined", "null", true, false, "true", "false", 42, "42", 3.14159, "3.14159", {}, "{}", function() { return undefined; }];
+          var expectedValues = [ undefined, null, "", "undefined", null, true, false, true, false, 42, 42, 3.14159, 3.14159, {}, {}, function() { return undefined; }];
+
+          invalidValues.forEach(function (invalidValue, index) {
+            element.value = invalidValue;
+            var expectedValue = expectedValues[index];
+
+            assert.equal(true, areEqual({}, element.ruleConfig), "rule config not set correctly");
+            assert.equal(true, areEqual(expectedValue, element.value, "value not set correctly"));
+          });
+
+        });
+
+        test('valid ruleConfig valid value', function () {
+          var element = fixture('propertyTests');
+          element.ruleConfig = getRuleConfig();
+          element.value = getValue();
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue(), element.value), 'value not set correctly');
+        });
+
+        test('add new valid ruleConfig valid value', function () {
+          var element = fixture('propertyTests');
+          element.ruleConfig = getRuleConfig();
+          element.value = getValue();
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue(), element.value), 'value not set correctly');
+
+          element._addRule();
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getAddNewValue(), element.value), 'value not set correctly');
+        });
+
+        test('reorder move down valid ruleConfig valid value', function () {
+          var element = fixture('propertyTests');
+          element.ruleConfig = getRuleConfig();
+          element.value = getValue3();
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._reorderMoveDown(0);
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getMoveDownValue(), element.value), 'value not set correctly');
+        });
+
+        test('reorder move up valid ruleConfig valid value', function () {
+          var element = fixture('propertyTests');
+          element.ruleConfig = getRuleConfig();
+          element.value = getValue3();
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._reorderMoveUp(2);
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getMoveUpValue(), element.value), 'value not set correctly');
+        });
+
+        test('remove valid ruleConfig valid value', function () {
+          var element = fixture('propertyTests');
+          element.ruleConfig = getRuleConfig();
+          element.value = getValue3();
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getValue3(), element.value), 'value not set correctly');
+
+          element._removeRule(1);
+
+          assert.equal(true, areEqual(getRuleConfig(), element.ruleConfig), 'rule config not set correctly');
+          assert.equal(true, areEqual(getRemoveValue(), element.value), 'value not set correctly');
+        });
+
 
       });
     });

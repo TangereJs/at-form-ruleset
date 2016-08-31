@@ -303,8 +303,8 @@ Design guidelines:
       if (isString(newValue))
       {
         try {
-          var parsedConfig = JSON.parse(newValue);
-          this.ruleConfig = parsedConfig;
+          var parsedValue = JSON.parse(newValue);
+          this.value = parsedValue;
         } catch (e) {
           console.log(e);
         }
