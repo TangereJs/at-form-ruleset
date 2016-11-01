@@ -122,466 +122,465 @@ Design guidelines:
       </div>
     </div>
   </template>
-</dom-module>
-<script>
-  'use strict';
-  //  It appears that .ruleset property and .value property mean the same thing. IMO, .ruleset should be removed because .value is standard way of naming in at-form-* components
-  // *ij* ruleset needs config; .ruleset property should be renamed to ruleConfig; this would be either json schema or static config for the at-rule-edit
-  // use case is that one ruleset should be built for a single schema; multiple rules share a single schema but each rule has its own data
-  Polymer({
-    is: 'at-form-ruleset',
-    properties: {
 
-      /**
-       * Elements label
-       * @property label
-       * @type String
-       * @default ""
-       */
-      label: {
-        type: String,
-        value: ''
-      },
+  <script>
+    'use strict';
+    //  It appears that .ruleset property and .value property mean the same thing. IMO, .ruleset should be removed because .value is standard way of naming in at-form-* components
+    // *ij* ruleset needs config; .ruleset property should be renamed to ruleConfig; this would be either json schema or static config for the at-rule-edit
+    // use case is that one ruleset should be built for a single schema; multiple rules share a single schema but each rule has its own data
+    Polymer({
+      is: 'at-form-ruleset',
+      properties: {
 
-      /**
-       * When true label is hidden
-       * @property hideLabel
-       * @type Boolean
-       * @default false
-       */
-      hideLabel: {
-        type: Boolean,
-        value: false,
-        observer: '_hideLabelChanged'
-      },
-
-      /**
-       * When true element is disabled; user input is not possible
-       * @property disabled
-       * @type Boolean
-       * @default false
-       */
-      disabled: {
-        type: Boolean,
-        value: false,
-        observer: '_disabledChanged'
-      },
-
-      /**
-       * Hides the element. When hidden nothing is displayed for the element
-       * @property hide
-       * @type Boolean
-       * @default false
-       */
-      hide: {
-        type: Boolean,
-        value: false,
-        observer: '_hideChanged'
-      },
-
-      /**
-       * Element configuration; for conditions and actions
-       * @property ruleConfig
-       * @type Object
-       * @default {}
-       */
-      ruleConfig: {
-        type: Object,
-        value: function() {
-          return {};
+        /**
+         * Elements label
+         * @property label
+         * @type String
+         * @default ""
+         */
+        label: {
+          type: String,
+          value: ''
         },
-        observer: '_ruleConfigChanged'
-      },
 
-      /**
-       * Element's value
-       * @property value
-       * @type Array
-       * @default []
-       */
-      value: {
-        type: Array,
-        value: function() {
-          return [];
+        /**
+         * When true label is hidden
+         * @property hideLabel
+         * @type Boolean
+         * @default false
+         */
+        hideLabel: {
+          type: Boolean,
+          value: false,
+          observer: '_hideLabelChanged'
         },
-        observer: '_valueChanged'
-      }
 
-    },
+        /**
+         * When true element is disabled; user input is not possible
+         * @property disabled
+         * @type Boolean
+         * @default false
+         */
+        disabled: {
+          type: Boolean,
+          value: false,
+          observer: '_disabledChanged'
+        },
 
-    _hideLabelChanged: function(newValue, oldValue) {
-      this.toggleClass("hidden", newValue, this.$.labelContainer);
-    },
+        /**
+         * Hides the element. When hidden nothing is displayed for the element
+         * @property hide
+         * @type Boolean
+         * @default false
+         */
+        hide: {
+          type: Boolean,
+          value: false,
+          observer: '_hideChanged'
+        },
 
-    ready: function() {
-      var self = this;
-      this.$.addRuleButton.addEventListener('click', function(event) {
-        event.stopPropagation();
-        self._addRule();
-      });
-      this._isReady = true;
-    },
-
-    _disabledChanged: function(newValue, oldValue) {
-      //      debugger;
-      // update add rule button state
-      // update move up / down / remove buttons
-      var
-        uiButtonIndex,
-        uiButton,
-        uiButtons,
-        captionInputIndex,
-        captionInput,
-        captionInputs,
-        ruleEditIndex,
-        ruleEdit,
-        ruleEdits;
-
-      uiButtons = Polymer.dom(this.root).querySelectorAll('button');
-      for (uiButtonIndex = 0; uiButtonIndex < uiButtons.length; uiButtonIndex += 1) {
-        this.toggleAttribute('disabled', newValue, uiButtons[uiButtonIndex]);
-      }
-
-      // update caption input field
-      captionInputs = Polymer.dom(this.root).querySelectorAll('input');
-      for (captionInputIndex = 0; captionInputIndex < captionInputs.length; captionInputIndex += 1) {
-        this.toggleAttribute('disabled', newValue, captionInputs[captionInputIndex]);
-      }
-
-      // disable the at-rule-edit elements
-      ruleEdits = Polymer.dom(this.$.ruleInsertPoint).querySelectorAll('at-rule-edit');
-      for (ruleEditIndex = 0; ruleEditIndex < ruleEdits.length; ruleEditIndex += 1) {
-        ruleEdit = ruleEdits[ruleEditIndex];
-        ruleEdit.disabled = newValue;
-      }
-
-    },
-
-    _hideChanged: function(newValue, oldValue) {
-      var wrapper = this.$.atFormRulesetWrapper;
-      this.toggleClass('hidden', newValue, wrapper);
-    },
-
-    _ruleConfigChanged: function(newValue, oldValue) {
-
-      function isString(obj) {
-        return Object.prototype.toString.call(obj) === "[object String]";
-      }
-
-      function isObject(obj) {
-        return Object.prototype.toString.call(obj) === "[object Object]";
-      }
-
-      if (isString(newValue))
-      {
-        try {
-          var parsedConfig = JSON.parse(newValue);
-          this.ruleConfig = parsedConfig;
-        } catch (e) {
-          console.log(e);
-        }
-        return;
-      }
-
-      if (!isObject(newValue)) {
-        return;
-      }
-
-      this.__rebuildHtml();
-    },
-
-    _valueChanged: function(newValue, oldValue) {
-
-      function isString(obj) {
-        return Object.prototype.toString.call(obj) === "[object String]";
-      }
-
-      function isArray(obj) {
-        return Object.prototype.toString.call(obj) === "[object Array]";
-      }
-
-      if (isString(newValue))
-      {
-        try {
-          var parsedValue = JSON.parse(newValue);
-          this.value = parsedValue;
-        } catch (e) {
-          console.log(e);
-        }
-        return;
-      }
-
-      if (!isArray(newValue)) {
-        return;
-      }
-
-      this.__rebuildHtml();
-    },
-
-    _addRule: function() {
-      var ruleIndex = this.value.length;
-      var newRule = {
-        caption: 'Rule #' + ruleIndex,
-        position: ruleIndex,
-        rule: {
-          conditions: {
-            kind: "all",
-            conditions: []
+        /**
+         * Element configuration; for conditions and actions
+         * @property ruleConfig
+         * @type Object
+         * @default {}
+         */
+        ruleConfig: {
+          type: Object,
+          value: function() {
+            return {};
           },
-          actions: []
+          observer: '_ruleConfigChanged'
+        },
+
+        /**
+         * Element's value
+         * @property value
+         * @type Array
+         * @default []
+         */
+        value: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          observer: '_valueChanged'
         }
-      };
 
-      this.value.push(newRule);
-      this.__rebuildHtml();
-      this._fireValueChangedEvent(this.value);
-    },
-    _removeRule: function(ruleIndex) {
-      this.value.splice(ruleIndex, 1);
-      this.__rebuildHtml();
-      this._fireValueChangedEvent(this.value);
-    },
-    _reorderMoveUp: function(ruleIndex) {
-      var moveToIndex = ruleIndex - 1;
-      var tmp;
+      },
 
-      tmp = this.value[ruleIndex];
-      this.value[ruleIndex] = this.value[moveToIndex];
-      this.value[moveToIndex] = tmp;
+      _hideLabelChanged: function(newValue, oldValue) {
+        this.toggleClass("hidden", newValue, this.$.labelContainer);
+      },
 
-      this.__rebuildHtml();
-      this._fireValueChangedEvent(this.value);
-    },
-    _reorderMoveDown: function(ruleIndex) {
-      var moveToIndex = ruleIndex + 1;
-      var tmp;
+      ready: function() {
+        var self = this;
+        this.$.addRuleButton.addEventListener('click', function(event) {
+          event.stopPropagation();
+          self._addRule();
+        });
+        this._isReady = true;
+      },
 
-      tmp = this.value[ruleIndex];
-      this.value[ruleIndex] = this.value[moveToIndex];
-      this.value[moveToIndex] = tmp;
+      _disabledChanged: function(newValue, oldValue) {
+        //      debugger;
+        // update add rule button state
+        // update move up / down / remove buttons
+        var
+          uiButtonIndex,
+          uiButton,
+          uiButtons,
+          captionInputIndex,
+          captionInput,
+          captionInputs,
+          ruleEditIndex,
+          ruleEdit,
+          ruleEdits;
 
-      this.__rebuildHtml();
-      this._fireValueChangedEvent(this.value);
-    },
+        uiButtons = Polymer.dom(this.root).querySelectorAll('button');
+        for (uiButtonIndex = 0; uiButtonIndex < uiButtons.length; uiButtonIndex += 1) {
+          this.toggleAttribute('disabled', newValue, uiButtons[uiButtonIndex]);
+        }
 
-    _fireValueChangedEvent: function (value) {
-      this.fire('value-changed', {
-        value: this.value
-      }, {
-        bubbles: false
-      });
-    },
+        // update caption input field
+        captionInputs = Polymer.dom(this.root).querySelectorAll('input');
+        for (captionInputIndex = 0; captionInputIndex < captionInputs.length; captionInputIndex += 1) {
+          this.toggleAttribute('disabled', newValue, captionInputs[captionInputIndex]);
+        }
 
-    __rebuildHtml: function() {
-      var
-        ruleIndex,
-        rule,
-        ruleHtml,
-        isFirst, isLast;
+        // disable the at-rule-edit elements
+        ruleEdits = Polymer.dom(this.$.ruleInsertPoint).querySelectorAll('at-rule-edit');
+        for (ruleEditIndex = 0; ruleEditIndex < ruleEdits.length; ruleEditIndex += 1) {
+          ruleEdit = ruleEdits[ruleEditIndex];
+          ruleEdit.disabled = newValue;
+        }
 
-      function ruleConfigEmpty(ruleConfig) {
-        return Object.keys(ruleConfig).length === 0 || Object.keys(ruleConfig.properties).length === 0;
-      }
+      },
 
-      if (!this._isReady) {
-        return;
-      }
+      _hideChanged: function(newValue, oldValue) {
+        var wrapper = this.$.atFormRulesetWrapper;
+        this.toggleClass('hidden', newValue, wrapper);
+      },
 
-      if (ruleConfigEmpty(this.ruleConfig)) {
-        console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
-        this.toggleClass('hidden', true, this.$.hideThisWhenPropertiesAreEmpty);
-        this.label = "Provide rule config for ruleset. Ruleset can not function correctly without rule config";
-        return;
-      } else {
-        this.label = "";
-        this.toggleClass('hidden', false, this.$.hideThisWhenPropertiesAreEmpty);
-      }
+      _ruleConfigChanged: function(newValue, oldValue) {
 
-      Polymer.dom(this.$.ruleInsertPoint).innerHTML = '';
+        function isString(obj) {
+          return Object.prototype.toString.call(obj) === "[object String]";
+        }
 
-      for (ruleIndex = 0; ruleIndex < this.value.length; ruleIndex += 1) {
-        rule = this.value[ruleIndex];
-        isFirst = ruleIndex === 0;
-        isLast = ruleIndex === this.value.length - 1;
-        ruleHtml = this.__buildRuleHtml(rule, isFirst, isLast, ruleIndex);
+        function isObject(obj) {
+          return Object.prototype.toString.call(obj) === "[object Object]";
+        }
 
-        Polymer.dom(this.$.ruleInsertPoint).appendChild(ruleHtml);
-      }
-    },
-    __buildRuleHtml: function(rule, isFirst, isLast, ruleIndexInValueArray) {
-      var ruleHtml,
-        captionActionsDiv,
-        captionInput,
-        moveUpBtn,
-        moveDownBtn,
-        removeBtn,
-        ruleDiv,
-        atFormRuleElem,
-        tmpSpan,
-        tmpDiv,
-        ruleCaptionText,
-        self = this,
-        icon,
-        text;
+        if (isString(newValue)) {
+          try {
+            var parsedConfig = JSON.parse(newValue);
+            this.ruleConfig = parsedConfig;
+          } catch (e) {
+            console.log(e);
+          }
+          return;
+        }
 
-      ruleCaptionText = rule && rule.caption ? rule.caption : '';
+        if (!isObject(newValue)) {
+          return;
+        }
 
-      // rule html is a div with vertical layout
-      // it contains two divs with horizontal layouts
-      // first div contains caption and move up / down links and remove link
-      // second div contains the at-rule-edit component
+        this.__rebuildHtml();
+      },
 
-      // create the html
+      _valueChanged: function(newValue, oldValue) {
 
-      ruleHtml = document.createElement('div');
-      Polymer.dom(ruleHtml).classList.add('vertical');
-      Polymer.dom(ruleHtml).classList.add('layout');
-      Polymer.dom(ruleHtml).classList.add('ruleBorder'); // border is for debug purposes
+        function isString(obj) {
+          return Object.prototype.toString.call(obj) === "[object String]";
+        }
 
-      captionActionsDiv = document.createElement('div');
-      Polymer.dom(captionActionsDiv).classList.add('horizontal');
-      Polymer.dom(captionActionsDiv).classList.add('layout');
+        function isArray(obj) {
+          return Object.prototype.toString.call(obj) === "[object Array]";
+        }
 
-      tmpDiv = document.createElement('div');
-      Polymer.dom(tmpDiv).classList.add('flex');
-      Polymer.dom(tmpDiv).classList.add('horizontal');
-      Polymer.dom(tmpDiv).classList.add('layout');
-      tmpSpan = document.createElement('span');
-      Polymer.dom(tmpSpan).innerHTML = 'Caption: ';
-      Polymer.dom(tmpSpan).classList.add('caption-span');
-      captionInput = document.createElement('input');
-      Polymer.dom(captionInput).setAttribute('type', 'text');
-      captionInput.value = ruleCaptionText;
-      Polymer.dom(captionInput).classList.add('value');
-      Polymer.dom(captionInput).classList.add('flex');
-      Polymer.dom(captionInput).classList.add('caption-input');
-      Polymer.dom(captionInput).setAttribute('data-rule-index', ruleIndexInValueArray);
-      this.toggleAttribute('disabled', this.disabled, captionInput);
-      captionInput.addEventListener('value-changed', function(event) {
-        event.stopPropagation();
-        var ruleIndex = parseInt(captionInput.getAttribute('data-rule-index'));
-        self.value[ruleIndex].caption = captionInput.value;
-      });
-      Polymer.dom(tmpDiv).appendChild(tmpSpan);
-      Polymer.dom(tmpDiv).appendChild(captionInput);
+        if (isString(newValue)) {
+          try {
+            var parsedValue = JSON.parse(newValue);
+            this.value = parsedValue;
+          } catch (e) {
+            console.log(e);
+          }
+          return;
+        }
 
-      Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
+        if (!isArray(newValue)) {
+          return;
+        }
 
-      tmpDiv = document.createElement('div');
-      if (!isFirst) {
-        moveUpBtn = document.createElement('button');
+        this.__rebuildHtml();
+      },
+
+      _addRule: function() {
+        var ruleIndex = this.value.length;
+        var newRule = {
+          caption: 'Rule #' + ruleIndex,
+          position: ruleIndex,
+          rule: {
+            conditions: {
+              kind: "all",
+              conditions: []
+            },
+            actions: []
+          }
+        };
+
+        this.value.push(newRule);
+        this.__rebuildHtml();
+        this._fireValueChangedEvent(this.value);
+      },
+      _removeRule: function(ruleIndex) {
+        this.value.splice(ruleIndex, 1);
+        this.__rebuildHtml();
+        this._fireValueChangedEvent(this.value);
+      },
+      _reorderMoveUp: function(ruleIndex) {
+        var moveToIndex = ruleIndex - 1;
+        var tmp;
+
+        tmp = this.value[ruleIndex];
+        this.value[ruleIndex] = this.value[moveToIndex];
+        this.value[moveToIndex] = tmp;
+
+        this.__rebuildHtml();
+        this._fireValueChangedEvent(this.value);
+      },
+      _reorderMoveDown: function(ruleIndex) {
+        var moveToIndex = ruleIndex + 1;
+        var tmp;
+
+        tmp = this.value[ruleIndex];
+        this.value[ruleIndex] = this.value[moveToIndex];
+        this.value[moveToIndex] = tmp;
+
+        this.__rebuildHtml();
+        this._fireValueChangedEvent(this.value);
+      },
+
+      _fireValueChangedEvent: function(value) {
+        this.fire('value-changed', {
+          value: this.value
+        }, {
+          bubbles: false
+        });
+      },
+
+      __rebuildHtml: function() {
+        var
+          ruleIndex,
+          rule,
+          ruleHtml,
+          isFirst, isLast;
+
+        function ruleConfigEmpty(ruleConfig) {
+          return Object.keys(ruleConfig).length === 0 || Object.keys(ruleConfig.properties).length === 0;
+        }
+
+        if (!this._isReady) {
+          return;
+        }
+
+        if (ruleConfigEmpty(this.ruleConfig)) {
+          console.debug('Provide rule config for ruleset. Ruleset can not function correctly without rule config');
+          this.toggleClass('hidden', true, this.$.hideThisWhenPropertiesAreEmpty);
+          this.label = "Provide rule config for ruleset. Ruleset can not function correctly without rule config";
+          return;
+        } else {
+          this.label = "";
+          this.toggleClass('hidden', false, this.$.hideThisWhenPropertiesAreEmpty);
+        }
+
+        Polymer.dom(this.$.ruleInsertPoint).innerHTML = '';
+
+        for (ruleIndex = 0; ruleIndex < this.value.length; ruleIndex += 1) {
+          rule = this.value[ruleIndex];
+          isFirst = ruleIndex === 0;
+          isLast = ruleIndex === this.value.length - 1;
+          ruleHtml = this.__buildRuleHtml(rule, isFirst, isLast, ruleIndex);
+
+          Polymer.dom(this.$.ruleInsertPoint).appendChild(ruleHtml);
+        }
+      },
+      __buildRuleHtml: function(rule, isFirst, isLast, ruleIndexInValueArray) {
+        var ruleHtml,
+          captionActionsDiv,
+          captionInput,
+          moveUpBtn,
+          moveDownBtn,
+          removeBtn,
+          ruleDiv,
+          atFormRuleElem,
+          tmpSpan,
+          tmpDiv,
+          ruleCaptionText,
+          self = this,
+          icon,
+          text;
+
+        ruleCaptionText = rule && rule.caption ? rule.caption : '';
+
+        // rule html is a div with vertical layout
+        // it contains two divs with horizontal layouts
+        // first div contains caption and move up / down links and remove link
+        // second div contains the at-rule-edit component
+
+        // create the html
+
+        ruleHtml = document.createElement('div');
+        Polymer.dom(ruleHtml).classList.add('vertical');
+        Polymer.dom(ruleHtml).classList.add('layout');
+        Polymer.dom(ruleHtml).classList.add('ruleBorder'); // border is for debug purposes
+
+        captionActionsDiv = document.createElement('div');
+        Polymer.dom(captionActionsDiv).classList.add('horizontal');
+        Polymer.dom(captionActionsDiv).classList.add('layout');
+
+        tmpDiv = document.createElement('div');
+        Polymer.dom(tmpDiv).classList.add('flex');
+        Polymer.dom(tmpDiv).classList.add('horizontal');
+        Polymer.dom(tmpDiv).classList.add('layout');
+        tmpSpan = document.createElement('span');
+        Polymer.dom(tmpSpan).innerHTML = 'Caption: ';
+        Polymer.dom(tmpSpan).classList.add('caption-span');
+        captionInput = document.createElement('input');
+        Polymer.dom(captionInput).setAttribute('type', 'text');
+        captionInput.value = ruleCaptionText;
+        Polymer.dom(captionInput).classList.add('value');
+        Polymer.dom(captionInput).classList.add('flex');
+        Polymer.dom(captionInput).classList.add('caption-input');
+        Polymer.dom(captionInput).setAttribute('data-rule-index', ruleIndexInValueArray);
+        this.toggleAttribute('disabled', this.disabled, captionInput);
+        captionInput.addEventListener('change', function(event) {
+          event.stopPropagation();
+          var ruleIndex = parseInt(captionInput.getAttribute('data-rule-index'));
+          self.value[ruleIndex].caption = captionInput.value;
+          self._fireValueChangedEvent(self.value);
+        });
+        Polymer.dom(tmpDiv).appendChild(tmpSpan);
+        Polymer.dom(tmpDiv).appendChild(captionInput);
+
+        Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
+
+        tmpDiv = document.createElement('div');
+        if (!isFirst) {
+          moveUpBtn = document.createElement('button');
+
+          icon = document.createElement('at-carbon-icon');
+          icon.icon = 'arrow-up';
+          Polymer.dom(moveUpBtn).appendChild(icon);
+
+          moveUpBtn.id = 'moveUpButton';
+          Polymer.dom(moveUpBtn).setAttribute('type', 'button');
+          text = document.createElement('span');
+          Polymer.dom(text).innerHTML = 'Move up';
+          Polymer.dom(moveUpBtn).appendChild(text);
+          this.toggleAttribute('disabled', this.disabled, moveUpBtn);
+          Polymer.dom(moveUpBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+          Polymer.dom(tmpDiv).appendChild(moveUpBtn);
+        }
+
+        if (!isLast) {
+          moveDownBtn = document.createElement('button');
+
+          icon = document.createElement('at-carbon-icon');
+          icon.icon = 'arrow-down';
+          Polymer.dom(moveDownBtn).appendChild(icon)
+
+          moveDownBtn.id = 'moveDownButton';
+          Polymer.dom(moveDownBtn).setAttribute('type', 'button');
+          text = document.createElement('span');
+          Polymer.dom(text).innerHTML = 'Move down';
+          Polymer.dom(moveDownBtn).appendChild(text);
+          this.toggleAttribute('disabled', this.disabled, moveDownBtn);
+          Polymer.dom(moveDownBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+          Polymer.dom(tmpDiv).appendChild(moveDownBtn);
+        }
+
+        removeBtn = document.createElement('button');
 
         icon = document.createElement('at-carbon-icon');
-        icon.icon = 'arrow-up';
-        Polymer.dom(moveUpBtn).appendChild(icon);
+        icon.icon = 'trash';
+        Polymer.dom(removeBtn).appendChild(icon);
 
-        moveUpBtn.id = 'moveUpButton';
-        Polymer.dom(moveUpBtn).setAttribute('type', 'button');
+        removeBtn.id = 'removeBtn';
+        Polymer.dom(removeBtn).setAttribute('type', 'button');
         text = document.createElement('span');
-        Polymer.dom(text).innerHTML = 'Move up';
-        Polymer.dom(moveUpBtn).appendChild(text);
-        this.toggleAttribute('disabled', this.disabled, moveUpBtn);
-        Polymer.dom(moveUpBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
-        Polymer.dom(tmpDiv).appendChild(moveUpBtn);
-      }
+        Polymer.dom(text).innerHTML = 'Remove';
+        Polymer.dom(removeBtn).appendChild(text);
+        this.toggleAttribute('disabled', this.disabled, removeBtn);
+        Polymer.dom(removeBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
+        Polymer.dom(tmpDiv).appendChild(removeBtn);
 
-      if (!isLast) {
-        moveDownBtn = document.createElement('button');
+        Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
 
-        icon = document.createElement('at-carbon-icon');
-        icon.icon = 'arrow-down';
-        Polymer.dom(moveDownBtn).appendChild(icon)
+        Polymer.dom(ruleHtml).appendChild(captionActionsDiv);
 
-        moveDownBtn.id = 'moveDownButton';
-        Polymer.dom(moveDownBtn).setAttribute('type', 'button');
-        text = document.createElement('span');
-        Polymer.dom(text).innerHTML = 'Move down';
-        Polymer.dom(moveDownBtn).appendChild(text);
-        this.toggleAttribute('disabled', this.disabled, moveDownBtn);
-        Polymer.dom(moveDownBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
-        Polymer.dom(tmpDiv).appendChild(moveDownBtn);
-      }
+        ruleDiv = document.createElement('div');
+        Polymer.dom(ruleDiv).classList.add('horizontal');
+        Polymer.dom(ruleDiv).classList.add('layout');
 
-      removeBtn = document.createElement('button');
-
-      icon = document.createElement('at-carbon-icon');
-      icon.icon = 'trash';
-      Polymer.dom(removeBtn).appendChild(icon);
-
-      removeBtn.id = 'removeBtn';
-      Polymer.dom(removeBtn).setAttribute('type', 'button');
-      text = document.createElement('span');
-      Polymer.dom(text).innerHTML = 'Remove';
-      Polymer.dom(removeBtn).appendChild(text);
-      this.toggleAttribute('disabled', this.disabled, removeBtn);
-      Polymer.dom(removeBtn).setAttribute('data-ruleIndex', ruleIndexInValueArray);
-      Polymer.dom(tmpDiv).appendChild(removeBtn);
-
-      Polymer.dom(captionActionsDiv).appendChild(tmpDiv);
-
-      Polymer.dom(ruleHtml).appendChild(captionActionsDiv);
-
-      ruleDiv = document.createElement('div');
-      Polymer.dom(ruleDiv).classList.add('horizontal');
-      Polymer.dom(ruleDiv).classList.add('layout');
-
-      tmpDiv = document.createElement('div');
-      atFormRuleElem = document.createElement('at-rule-edit');
-      atFormRuleElem.disabled = this.disabled;
-      if (this.ruleConfig.properties) {
-        atFormRuleElem.schema = this.ruleConfig;
-      } else if (this.ruleConfig.conditions && this.ruleConfig.actions) {
-        atFormRuleElem.ruleConfig = this.ruleConfig;
-      }
+        tmpDiv = document.createElement('div');
+        atFormRuleElem = document.createElement('at-rule-edit');
+        atFormRuleElem.disabled = this.disabled;
+        if (this.ruleConfig.properties) {
+          atFormRuleElem.schema = this.ruleConfig;
+        } else if (this.ruleConfig.conditions && this.ruleConfig.actions) {
+          atFormRuleElem.ruleConfig = this.ruleConfig;
+        }
 
 
-      if (rule.rule) {
-        atFormRuleElem.value = rule.rule;
-      }
+        if (rule.rule) {
+          atFormRuleElem.value = rule.rule;
+        }
 
-      Polymer.dom(tmpDiv).appendChild(atFormRuleElem);
+        Polymer.dom(tmpDiv).appendChild(atFormRuleElem);
 
-      Polymer.dom(ruleDiv).appendChild(tmpDiv);
-      Polymer.dom(ruleHtml).appendChild(ruleDiv);
+        Polymer.dom(ruleDiv).appendChild(tmpDiv);
+        Polymer.dom(ruleHtml).appendChild(ruleDiv);
 
-      // setup event listeners
+        // setup event listeners
 
-      if (moveUpBtn) {
-        moveUpBtn.addEventListener('click', function(event) {
+        if (moveUpBtn) {
+          moveUpBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            var target = event.currentTarget;
+            var ruleIndex = target.getAttribute('data-ruleIndex');
+            ruleIndex = parseInt(ruleIndex);
+            self._reorderMoveUp(ruleIndex);
+            return false;
+          });
+        }
+
+        if (moveDownBtn) {
+          moveDownBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            var target = event.currentTarget;
+            var ruleIndex = target.getAttribute('data-ruleIndex');
+            ruleIndex = parseInt(ruleIndex);
+            self._reorderMoveDown(ruleIndex);
+            return false;
+          });
+        }
+
+        removeBtn.addEventListener('click', function(event) {
           event.stopPropagation();
           var target = event.currentTarget;
           var ruleIndex = target.getAttribute('data-ruleIndex');
           ruleIndex = parseInt(ruleIndex);
-          self._reorderMoveUp(ruleIndex);
+          self._removeRule(ruleIndex);
           return false;
         });
+
+        return ruleHtml;
       }
-
-      if (moveDownBtn) {
-        moveDownBtn.addEventListener('click', function(event) {
-          event.stopPropagation();
-          var target = event.currentTarget;
-          var ruleIndex = target.getAttribute('data-ruleIndex');
-          ruleIndex = parseInt(ruleIndex);
-          self._reorderMoveDown(ruleIndex);
-          return false;
-        });
-      }
-
-      removeBtn.addEventListener('click', function(event) {
-        event.stopPropagation();
-        var target = event.currentTarget;
-        var ruleIndex = target.getAttribute('data-ruleIndex');
-        ruleIndex = parseInt(ruleIndex);
-        self._removeRule(ruleIndex);
-        return false;
-      });
-
-      return ruleHtml;
-    }
-  });
-</script>
-
+    });
+  </script>
+</dom-module>
 
 <!-- HTML template for the rule
   <div class="vertical layout">

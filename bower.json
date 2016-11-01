@@ -9,5 +9,6 @@
     "at-core-form": "TangereJs/at-core-form#0.8-preview",
     "at-doc-viewer": "TangereJs/at-doc-viewer#0.8-preview",
     "at-rule-edit": "TangereJs/at-rule-edit#0.8-preview"
-  }
+  },
+  "version": "0.0.1.3"
 }
