@@ -1,0 +1,55 @@
+<link rel="import" href="../../tangere/tangere.html" />
+<link rel="import" href="../../at-theme/at-theme.html" />
+
+<dom-module id="at-form-ruleset-styles">
+  <template>
+    <style>
+      .ruleset-header {        
+        @apply(--paper-font-body1);
+        @apply(--paper-font-common-nowrap);
+        font-size: 18px;
+        line-height: 36px;
+        margin: 0;
+      }
+
+      .ruleset-header.hidden {
+        display: none !important;
+      }
+
+      .ruleset-body {
+        @apply(--layout-vertical);
+
+      }
+
+      .ruleset-content {
+
+      }
+
+      .rule-header {
+        @apply(--layout-horizontal);
+      }
+
+      .rule-header .rule-caption {
+        display: block;
+        width: 100%;
+      }
+
+      .rule-header .rule-toolbox {
+        @apply(--layout-horizontal);
+        padding: 0 4px;
+        align-self: center;
+      }
+
+      .rule-header .rule-toolbox .rule-toolbox-button {
+        margin: 0 2px;
+      }
+
+      .ruleset-footer {
+        @apply(--layout-horizontal);
+        line-height: 40px;
+      }
+    </style>    
+  </template>
+</dom-module>
+
+
