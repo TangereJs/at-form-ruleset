@@ -61,10 +61,10 @@ Design guidelines:
     <h4 id="label" class="ruleset-header">{{label}}</h4>
 
     <div id="rulesetBody" class="ruleset-body debug">
-      <template id="ruleRenderer" is="dom-repeat" items="{{_value}}" as="rule">
+      <template id="ruleRenderer" is="dom-repeat" items="[[_value]]" as="rule">
         <div class="ruleset-content">
           <div class="rule-header">
-            <at-form-text label="Caption" value="{{rule.caption}}" class="rule-caption"></at-form-text>
+            <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption"></at-form-text>
             <div class="rule-toolbox">
               <template is="dom-if" if="{{_hasDownButton(_value, index)}}">
                 <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_reorderMoveDown" class="rule-toolbox-button"></at-carbon-icon-button>
@@ -75,7 +75,7 @@ Design guidelines:
               <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_removeRule" class="rule-toolbox-button"></at-carbon-icon-button>
             </div>
           </div>
-          <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="{{rule.rule}}"></at-rule-edit>
+          <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="[[rule.rule]]"></at-rule-edit>
         </div>
       </template>      
 
