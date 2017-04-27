@@ -39,26 +39,19 @@ Design guidelines:
 
 <dom-module id="at-form-ruleset">
   <template>
-    <style include="at-form-ruleset-styles"></style>
-    <style>
+    <style include="at-form-ruleset-styles">
       :host {
         display: block;
         box-sizing: border-box;
-
         padding: 0 6px;
-      }
-
-      .debug * {
-        border: 1px solid green;
       }
 
       :host.hidden {
         display: none !important;
-      }
-
+      }      
     </style>
 
-    <h4 id="label" class="ruleset-header">{{label}}</h4>
+    <h4 id="label" class="ruleset-header" disabled$="[[disabled]]">{{label}}</h4>
 
     <div id="rulesetBody" class="ruleset-body">
       <template id="ruleRenderer" is="dom-repeat" items="[[_value]]" as="rule">
