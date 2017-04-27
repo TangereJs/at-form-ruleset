@@ -64,15 +64,15 @@ Design guidelines:
       <template id="ruleRenderer" is="dom-repeat" items="[[_value]]" as="rule">
         <div class="ruleset-content">
           <div class="rule-header">
-            <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption"></at-form-text>
+            <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption" disabled="[[disabled]]"></at-form-text>
             <div class="rule-toolbox">
               <template is="dom-if" if="{{_hasDownButton(_value, index)}}">
-                <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_reorderMoveDown" class="rule-toolbox-button"></at-carbon-icon-button>
+                <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_reorderMoveDown" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
               </template>
               <template is="dom-if" if="{{_hasUpButton(_value, index)}}">
-                <at-carbon-icon-button icon="now:arrow-up" data-ruleIndex$="{{index}}" on-tap="_reorderMoveUp" class="rule-toolbox-button"></at-carbon-icon-button>
+                <at-carbon-icon-button icon="now:arrow-up" data-ruleIndex$="{{index}}" on-tap="_reorderMoveUp" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
               </template>
-              <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_removeRule" class="rule-toolbox-button"></at-carbon-icon-button>
+              <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_removeRule" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
             </div>
           </div>
           <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="[[rule.rule]]" disabled="[[disabled]]"></at-rule-edit>
@@ -80,7 +80,7 @@ Design guidelines:
       </template>      
 
       <div class="ruleset-footer">
-        <at-carbon-icon-button id="addRuleButton" icon="now:plus"></at-carbon-icon-button>
+        <at-carbon-icon-button id="addRuleButton" icon="now:plus" disabled="[[disabled]]"></at-carbon-icon-button>
       </div>
     </div>
 
