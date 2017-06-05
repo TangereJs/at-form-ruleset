@@ -68,7 +68,7 @@ Design guidelines:
               <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_removeRule" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
             </div>
           </div>
-          <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="[[rule.rule]]" disabled="[[disabled]]"></at-rule-edit>
+          <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="[[rule.rule]]" disabled="[[disabled]]" data-index$="[[index]]" on-value-changed="_handleRuleEditValueChanged"></at-rule-edit>
         </div>
       </template>      
 
@@ -344,6 +344,14 @@ Design guidelines:
 
         this.set('_value', []);
         this.set('_value', _value);
+
+        this._fireValueChangedEvent(this.value);
+      },
+
+      _handleRuleEditValueChanged: function(event) {
+        var index = event.target.getAttribute('data-index');
+        var value = event.detail.value;
+        this.value[index].rule = value;
 
         this._fireValueChangedEvent(this.value);
       },
