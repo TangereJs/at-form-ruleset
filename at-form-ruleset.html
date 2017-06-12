@@ -51,13 +51,13 @@ Design guidelines:
       }      
     </style>
 
-    <h4 id="label" class="ruleset-header" disabled$="[[disabled]]">{{label}}</h4>
+    <h4 id="label" class="ruleset-header" disabled$="[[disabled]]" hidden$="[[hideLabel]]">{{label}}</h4>
 
     <div id="rulesetBody" class="ruleset-body">
       <template id="ruleRenderer" is="dom-repeat" items="[[_value]]" as="rule">
         <div class="ruleset-content">
           <div class="rule-header">
-            <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption" disabled="[[disabled]]"></at-form-text>
+            <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption" disabled="[[disabled]]" data-index$="[[index]]" on-value-changed="_handleCaptionValueChanged"></at-form-text>
             <div class="rule-toolbox">
               <template is="dom-if" if="{{_hasDownButton(_value, index)}}">
                 <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_reorderMoveDown" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
@@ -106,8 +106,7 @@ Design guidelines:
          */
         hideLabel: {
           type: Boolean,
-          value: false,
-          observer: '_hideLabelChanged'
+          value: false
         },
 
         /**
@@ -164,10 +163,6 @@ Design guidelines:
 
       },
 
-      _hideLabelChanged: function(newValue, oldValue) {
-        this.toggleClass("hidden", newValue, this.$.label);
-      },
-
       ready: function() {
         this._value = [];
 
@@ -177,6 +172,12 @@ Design guidelines:
           self._addRule();
         });
         this._isReady = true;
+      },
+
+      _handleCaptionValueChanged: function(event) {
+        var ruleIndex = event.currentTarget.getAttribute('data-index');
+        this.value[ruleIndex].caption = event.detail.value;
+        this._fireValueChangedEvent(this.value);
       },
 
       _disabledChanged: function(newValue, oldValue) {
