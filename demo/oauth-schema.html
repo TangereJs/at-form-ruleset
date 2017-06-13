@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>oauthschema demo page</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../at-theme/at-theme.html" />
+    <link rel="import" href="../../at-core-form/at-core-form.html" />
+    <link rel="import" href="../at-form-ruleset.html">
+
+    <style is="custom-style">
+      .container {
+        @apply(--layout-horizontal);
+      }
+
+      .core-form {
+        @apply(--layout-flex-6);
+      }
+
+      .form-ruleset {
+        @apply(--layout-flex-6);
+      }
+    </style>
+  </head>
+
+  <body>    
+    <div class="container">
+      <at-form-ruleset id="formRuleset" class="form-ruleset"></at-form-ruleset>      
+      <at-core-form id="coreForm" class="core-form"></at-core-form>
+    </div>
+
+    <script>
+      (function() {
+
+        var schema = {
+          "rules": [{
+              "caption": "Rule ###333",
+              "position": 0,
+              "rule": {
+                "conditions": {
+                  "kind": "all",
+                  "conditions": [{
+                    "name": "mode",
+                    "operator": "notEqualTo",
+                    "compareTo": "text",
+                    "value": "disabled"
+                  }]
+                },
+                "actions": [{
+                    "actionName": "setFieldState",
+                    "fieldName": "linkText",
+                    "state": "optional"
+                  },
+                  {
+                    "actionName": "setFieldState",
+                    "fieldName": "connectorId",
+                    "state": "required"
+                  },
+                  {
+                    "actionName": "setFieldState",
+                    "fieldName": "signOutUrl",
+                    "state": "optional"
+                  }
+                ]
+              }
+            },
+            {
+              "caption": "Rule ###444",
+              "position": 1,
+              "rule": {
+                "conditions": {
+                  "kind": "all",
+                  "conditions": [{
+                    "name": "mode",
+                    "operator": "equalTo",
+                    "compareTo": "text",
+                    "value": "required"
+                  }]
+                },
+                "actions": [{
+                  "actionName": "setFieldState",
+                  "fieldName": "linkText",
+                  "state": "disabled"
+                }]
+              }
+            }
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "xtype": "enum",
+              "xvaluelist": [{
+                  "title": "Disabled",
+                  "value": "disabled"
+                },
+                {
+                  "title": "Optional",
+                  "value": "optional"
+                },
+                {
+                  "title": "Required",
+                  "value": "required"
+                }
+              ],
+              "selectedItems": [{
+                "title": "Optional",
+                "value": "optional"
+              }],
+              "noPreload": true,
+              "maxItems": "1",
+              "title": "Login Mode",
+              "itemView": "",
+              "xgridcols": "6",
+              "default": "disabled"
+            },
+            "linkText": {
+              "type": "string",
+              "disabled": true,
+              "maxChars": "0",
+              "hint": "e.g. Login with Office 365",
+              "title": "Login link text",
+              "xgridcols": "6",
+              "default": "Use Single Sign On"
+            },
+            "connectorId": {
+              "type": "string",
+              "xtype": "lookup",
+              "disabled": true,
+              "required": true,
+              "noPreload": true,
+              "url": "/api/adenin.GateKeeper.Content/Connector",
+              "xurl": "/api/adenin.GateKeeper.Content/Connector",
+              "maxItems": "1",
+              "autoValidate": true,
+              "title": "OAuth Login Connector",
+              "itemView": "",
+              "xgridcols": "6"
+            },
+            "signOutUrl": {
+              "type": "string",
+              "disabled": true,
+              "maxChars": "0",
+              "title": "Sign Out Url",
+              "xgridcols": "6"
+            }
+          }
+        };
+
+        var coreForm = document.getElementById('coreForm');
+        var formRuleset = document.getElementById('formRuleset');
+
+        coreForm.schema = schema;
+        formRuleset.ruleConfig = schema;
+        formRuleset.value = schema.rules;
+      })();
+    </script>
+  </body>
+
+</html>
