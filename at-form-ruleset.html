@@ -1,7 +1,7 @@
 <link rel="import" href="../tangere/tangere.html">
-<!-- <link rel="import" href="../at-theme/at-theme.html"> -->
+<link rel="import" href="../at-theme/at-theme.html">
 <link rel="import" href="styles/at-form-ruleset-styles.html" />
-<link rel="import" href="../at-carbon-icon-button/at-carbon-icon-button.html">
+<link rel="import" href="../at-carbon-button/at-carbon-button.html" />
 <link rel="import" href="../at-rule-edit/at-rule-edit.html">
 <link rel="import" href="../at-form-text/at-form-text.html" />
 <!--
@@ -72,8 +72,8 @@ Design guidelines:
         </div>
       </template>      
 
-      <div class="ruleset-footer">
-        <at-carbon-icon-button id="addRuleButton" icon="now:plus" disabled="[[disabled]]"></at-carbon-icon-button>
+      <div>
+        <at-carbon-button raised id="addRuleButton" icon="now:plus" label="Add Rule" class="add-rule-button" disabled="[[disabled]]"></at-carbon-button>
       </div>
     </div>
 
