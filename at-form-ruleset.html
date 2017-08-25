@@ -60,12 +60,12 @@ Design guidelines:
             <at-form-text label="Caption" value="[[rule.caption]]" class="rule-caption" disabled="[[disabled]]" data-index$="[[index]]" on-value-changed="_handleCaptionValueChanged"></at-form-text>
             <div class="rule-toolbox">
               <template is="dom-if" if="{{_hasDownButton(_value, index)}}">
-                <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_reorderMoveDown" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
+                <at-carbon-icon-button icon="now:arrow-down" data-ruleIndex$="{{index}}" on-tap="_handleReorderMoveDownOnTap" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
               </template>
               <template is="dom-if" if="{{_hasUpButton(_value, index)}}">
-                <at-carbon-icon-button icon="now:arrow-up" data-ruleIndex$="{{index}}" on-tap="_reorderMoveUp" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
+                <at-carbon-icon-button icon="now:arrow-up" data-ruleIndex$="{{index}}" on-tap="_handleReorderMoveUpTapEvent" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
               </template>
-              <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_removeRule" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
+              <at-carbon-icon-button icon="now:trash" data-ruleIndex$="{{index}}" on-tap="_handleRemoveRuleTapEvent" class="rule-toolbox-button" disabled="[[disabled]]"></at-carbon-icon-button>
             </div>
           </div>
           <at-rule-edit class="rule-body" rule-config="[[ruleConfig]]" schema="[[ruleConfig]]" value="[[rule.rule]]" disabled="[[disabled]]" data-index$="[[index]]" on-value-changed="_handleRuleEditValueChanged"></at-rule-edit>
@@ -299,16 +299,25 @@ Design guidelines:
 
         this._fireValueChangedEvent(this.value);
       },
-      _removeRule: function(event) {
+
+      _handleRemoveRuleTapEvent: function(event) {
         var ruleIndex = parseInt(event.currentTarget.getAttribute('data-ruleIndex'));
-        
+        this._removeRule(ruleIndex);
+      },    
+
+      _removeRule: function(ruleIndex) {
         this.value.splice(ruleIndex, 1);
         this.splice('_value', ruleIndex, 1);
 
         this._fireValueChangedEvent(this.value);
       },
-      _reorderMoveUp: function(event) {
+
+      _handleReorderMoveUpTapEvent: function(event) {
         var ruleIndex = parseInt(event.currentTarget.getAttribute('data-ruleIndex'));
+        this._reorderMoveUp(ruleIndex);
+      },
+
+      _reorderMoveUp: function(ruleIndex) {
         var moveToIndex = ruleIndex - 1;
         var tmp;
 
@@ -328,8 +337,13 @@ Design guidelines:
         
         this._fireValueChangedEvent(this.value);
       },
-      _reorderMoveDown: function(event) {
+
+      _handleReorderMoveDownOnTap: function(event) {
         var ruleIndex = parseInt(event.currentTarget.getAttribute('data-ruleIndex'));
+        this._reorderMoveDown(ruleIndex);
+      },
+
+      _reorderMoveDown: function(ruleIndex) {
         var moveToIndex = ruleIndex + 1;
         var tmp;
 
