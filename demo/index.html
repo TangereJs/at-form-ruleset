@@ -8,15 +8,14 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title></title>
-  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../layout/layout.html">
-  <link rel="import" href="../at-core-form/at-core-form.html">
-  <link rel="import" href="../at-form-section/at-form-section.html" />
-  <link rel="import" href="at-form-ruleset.html">
+  <title>at-form-ruleset demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../at-core-form/at-core-form.html">
+  <link rel="import" href="../../at-form-section/at-form-section.html" />
+  <link rel="import" href="../at-form-ruleset.html">
+  <link rel="import" href="../../at-core-style-classes/at-core-style-classes.html" />
 
-
-  <style>
+  <style is="custom-style" include="at-core-style-classes">
     .light-padding {
       margin: 2px;
       border: 1px solid #bbb;
@@ -25,32 +24,29 @@
     .medium-padding {
       margin-left: 12px;
     }
+
   </style>
 </head>
 
 <body>
-  <div>
-    <h2>at-form-ruleset demo</h2>
-    
-    <div class="horizontal layout">
-      <div class="flex-4"></div>
-      <div class="flex-8 medium-padding">
-        <button id="disableRuleset">Toggle Disable</button>
-        <button id="verifyRuleset">Verify Ruleset</button>
-      </div>
-    </div>
+  <h2>at-form-ruleset demo</h2>
 
-    <div class="horizontal layout">
-      <div class="flex-4 light-padding">
-        <at-core-form id="coreForm">
-        </at-core-form>
-      </div>
-      <div class="flex-8 light-padding">
-        <at-form-ruleset id="demoRuleset" label="Demo Ruleset">
-        </at-form-ruleset>
-      </div>
+  <div class="layout-horizontal">
+    <div class="layout-flex-4"></div>
+    <div class="layout-flex-8 medium-padding">
+      <button id="disableRuleset">Toggle Disable</button>
+      <button id="verifyRuleset">Verify Ruleset</button>
     </div>
+  </div>
 
+  <div class="layout-horizontal">
+    <div class="layout-flex-4 light-padding">
+      <at-core-form id="coreForm">
+      </at-core-form>
+    </div>
+    <div class="layout-flex-8 light-padding">
+      <at-form-ruleset id="demoRuleset" label="Demo Ruleset"></at-form-ruleset>
+    </div>
   </div>
 </body>
 
@@ -71,7 +67,7 @@
           description: 'Tree',
           type: 'string',
           xtype: 'enum',
-          xvaluelist: [ { title: "Oak", value: "Oak" }, { title: "Chestnut", value: "Chestnut" }, { title: "Pine", value: "Pine" } ]
+          xvaluelist: [{ title: "Oak", value: "Oak" }, { title: "Chestnut", value: "Chestnut" }, { title: "Pine", value: "Pine" }]
         }
       }
     };
@@ -132,7 +128,6 @@
         rule = demoRuleset.value[ruleIndex];
         engine = new window.RuleEngine(rule.rule);
 
-
         conditionsAdapter = coreForm.data;
         actionsAdapter = {
           alert: function(data) {
@@ -173,6 +168,7 @@
 
     window.test = demoRuleset.value;
   });
+
 </script>
 
 </html>

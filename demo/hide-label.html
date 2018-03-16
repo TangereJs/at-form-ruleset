@@ -8,13 +8,13 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title></title>
-  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../layout/layout.html">
-  <link rel="import" href="../at-core-form/at-core-form.html">
-  <link rel="import" href="at-form-ruleset.html">
+  <title>at-form-ruleset demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../at-core-form/at-core-form.html">
+  <link rel="import" href="../at-form-ruleset.html">
+  <link rel="import" href="../../at-core-style-classes/at-core-style-classes.html" />
 
-  <style>
+  <style is="custom-style" include="at-core-style-classes">
     .light-padding {
       padding-left: 6px;
       padding-right: 6px;
@@ -25,26 +25,22 @@
 </head>
 
 <body>
-  <div class="vertical layout">
-    <div class="horizontal layout">
-      <h2>This is a demo for at-form-ruleset</h2>
+  <h2>This is a demo for at-form-ruleset</h2>
+
+  <div>
+    <button id="disableRuleset">Toggle Disable</button>
+  </div>
+  <div class="layout-horizontal">
+    <div class="layout-flex-4 light-padding">
+      <at-core-form id="coreForm">
+      </at-core-form>
     </div>
-    <div class="horizontal layout">
-      <button id="disableRuleset">Toggle Disable</button>
+    <div class="layout-flex-8 light-padding">
+      <at-form-ruleset id="demoRuleset" label="Form ruleset" hide-label></at-form-ruleset>
     </div>
-    <div class="horizontal layout">
-      <div class="flex-6 light-padding">
-        <at-core-form id="coreForm">
-        </at-core-form>
-      </div>
-      <div class="flex-6 light-padding">
-        <at-form-ruleset id="demoRuleset" label="Form ruleset" hide-label>
-        </at-form-ruleset>
-      </div>
-    </div>
-    <div class="horizontal layout center-justified light-padding">
-      <button id="verifyRuleset">Verify Ruleset</button>
-    </div>
+  </div>
+  <div class="layout-horizontal layout-center-justified light-padding">
+    <button id="verifyRuleset">Verify Ruleset</button>
   </div>
 </body>
 
